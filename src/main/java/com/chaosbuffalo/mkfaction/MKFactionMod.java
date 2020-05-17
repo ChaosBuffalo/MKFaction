@@ -8,13 +8,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-@Mod(MKFaction.MODID)
-public class MKFaction
+@Mod(MKFactionMod.MODID)
+public class MKFactionMod
 {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "mkfaction";
 
-    public MKFaction() {
+    public MKFactionMod() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 
     }

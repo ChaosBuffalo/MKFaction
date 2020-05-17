@@ -24,7 +24,7 @@ public class PlayerFactionEntry implements INBTSerializable<CompoundNBT> {
         if (factionName.equals(INVALID_FACTION)){
             factionScore = 0;
         } else {
-            Faction faction = MKFactionRegistry.getFaction(factionName);
+            MKFaction faction = MKFactionRegistry.getFaction(factionName);
             if (faction != null){
                 factionScore = faction.getDefaultPlayerScore();
             } else {

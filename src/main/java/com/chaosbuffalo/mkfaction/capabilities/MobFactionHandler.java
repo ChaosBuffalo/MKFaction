@@ -1,8 +1,8 @@
 package com.chaosbuffalo.mkfaction.capabilities;
 
-import com.chaosbuffalo.mkfaction.MKFaction;
+import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.MKFactionRegistry;
-import com.chaosbuffalo.mkfaction.faction.Faction;
+import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -15,8 +15,8 @@ import javax.annotation.Nullable;
 
 public class MobFactionHandler implements IMobFaction {
     private ResourceLocation factionName;
-    private Faction faction;
-    public static final ResourceLocation INVALID_FACTION = new ResourceLocation(MKFaction.MODID,
+    private MKFaction faction;
+    public static final ResourceLocation INVALID_FACTION = new ResourceLocation(MKFactionMod.MODID,
             "faction.invalid");
     private LivingEntity entity;
 
@@ -25,7 +25,7 @@ public class MobFactionHandler implements IMobFaction {
         entity = null;
     }
 
-    public Faction getFaction() {
+    public MKFaction getFaction() {
         return faction;
     }
 

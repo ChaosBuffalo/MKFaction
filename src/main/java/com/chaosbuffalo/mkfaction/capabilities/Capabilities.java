@@ -1,6 +1,6 @@
 package com.chaosbuffalo.mkfaction.capabilities;
 
-import com.chaosbuffalo.mkfaction.MKFaction;
+import com.chaosbuffalo.mkfaction.MKFactionMod;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,9 +14,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class Capabilities {
 
-    public static ResourceLocation PLAYER_FACTION_CAP_ID = new ResourceLocation(MKFaction.MODID,
+    public static ResourceLocation PLAYER_FACTION_CAP_ID = new ResourceLocation(MKFactionMod.MODID,
             "player_faction_data");
-    public static ResourceLocation MOB_FACTION_CAP_ID = new ResourceLocation(MKFaction.MODID,
+    public static ResourceLocation MOB_FACTION_CAP_ID = new ResourceLocation(MKFactionMod.MODID,
             "mob_faction_data");
 
     @CapabilityInject(IPlayerFaction.class)

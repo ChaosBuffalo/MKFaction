@@ -2,7 +2,6 @@ package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -10,13 +9,13 @@ import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Faction implements IForgeRegistryEntry<Faction> {
+public class MKFaction implements IForgeRegistryEntry<MKFaction> {
     private ResourceLocation name;
     private final Set<ResourceLocation> allies;
     private final Set<ResourceLocation> enemies;
-    private int defaultPlayerScore;
+    private final int defaultPlayerScore;
 
-    public Faction(ResourceLocation name, int defaultPlayerScore){
+    public MKFaction(ResourceLocation name, int defaultPlayerScore){
         setRegistryName(name);
         allies = new HashSet<>();
         enemies = new HashSet<>();
@@ -62,7 +61,7 @@ public class Faction implements IForgeRegistryEntry<Faction> {
     }
 
     @Override
-    public Faction setRegistryName(ResourceLocation name) {
+    public MKFaction setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
     }
@@ -74,7 +73,7 @@ public class Faction implements IForgeRegistryEntry<Faction> {
     }
 
     @Override
-    public Class<Faction> getRegistryType() {
-        return Faction.class;
+    public Class<MKFaction> getRegistryType() {
+        return MKFaction.class;
     }
 }
