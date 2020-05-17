@@ -2,6 +2,7 @@ package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -13,11 +14,17 @@ public class Faction implements IForgeRegistryEntry<Faction> {
     private ResourceLocation name;
     private final Set<ResourceLocation> allies;
     private final Set<ResourceLocation> enemies;
+    private int defaultPlayerScore;
 
-    public Faction(ResourceLocation name){
+    public Faction(ResourceLocation name, int defaultPlayerScore){
         setRegistryName(name);
         allies = new HashSet<>();
         enemies = new HashSet<>();
+        this.defaultPlayerScore = defaultPlayerScore;
+    }
+
+    public int getDefaultPlayerScore(){
+        return defaultPlayerScore;
     }
 
     public Set<ResourceLocation> getAllies() {

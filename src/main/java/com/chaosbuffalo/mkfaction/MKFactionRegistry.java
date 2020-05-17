@@ -8,9 +8,16 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 
+import javax.annotation.Nullable;
+
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class MKFactionRegistry {
     public static IForgeRegistry<Faction> FACTION_REGISTRY = null;
+
+    @Nullable
+    public static Faction getFaction(ResourceLocation name){
+        return FACTION_REGISTRY.getValue(name);
+    }
 
     @SuppressWarnings("unused")
     @SubscribeEvent

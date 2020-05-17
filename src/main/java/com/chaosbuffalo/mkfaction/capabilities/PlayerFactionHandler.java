@@ -49,7 +49,7 @@ public class PlayerFactionHandler implements IPlayerFaction {
             CompoundNBT factionsTag = nbt.getCompound("factions");
             for (String key : factionsTag.keySet()){
                 ResourceLocation factionName = new ResourceLocation(key);
-                PlayerFactionEntry newEntry = new PlayerFactionEntry();
+                PlayerFactionEntry newEntry = new PlayerFactionEntry(factionName);
                 newEntry.deserializeNBT(factionsTag.getCompound(key));
                 factionMap.put(factionName, newEntry);
             }

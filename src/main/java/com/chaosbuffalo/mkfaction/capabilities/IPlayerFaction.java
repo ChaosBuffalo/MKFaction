@@ -17,7 +17,9 @@ public interface IPlayerFaction extends INBTSerializable<CompoundNBT> {
     default PlayerFactionEntry getFactionEntry(ResourceLocation factionName){
         HashMap<ResourceLocation, PlayerFactionEntry> factions = getFactionMap();
         if (!factions.containsKey(factionName)){
-            factions.put(factionName, new PlayerFactionEntry());
+            PlayerFactionEntry newEntry = new PlayerFactionEntry(factionName);
+            newEntry.setToDefaultFactionScore();
+            factions.put(factionName, newEntry);
         }
         return factions.getOrDefault(factionName, PlayerFactionEntry.DEFAULT_ENTRY);
     }
