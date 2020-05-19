@@ -49,7 +49,7 @@ public class MobFactionHandler implements IMobFaction {
             return Targeting.TargetRelation.UNHANDLED;
         }
         return entity.getCapability(Capabilities.MOB_FACTION_CAPABILITY).map((faction) ->
-                getFaction().getEntityRelationship(entity, faction.getFactionName()))
+                getFaction().getNonPlayerEntityRelationship(entity, faction.getFactionName()))
                 .orElse(Targeting.TargetRelation.UNHANDLED);
     }
 

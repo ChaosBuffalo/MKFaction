@@ -50,7 +50,7 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
         return allies.contains(faction);
     }
 
-    public Targeting.TargetRelation getEntityRelationship(LivingEntity entity, ResourceLocation factionName){
+    public Targeting.TargetRelation getNonPlayerEntityRelationship(LivingEntity entity, ResourceLocation factionName){
         if (isEnemy(factionName)){
             return Targeting.TargetRelation.ENEMY;
         } else if (isAlly(factionName)){

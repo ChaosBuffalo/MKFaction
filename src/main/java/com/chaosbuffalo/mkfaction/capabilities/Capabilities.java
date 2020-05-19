@@ -38,6 +38,7 @@ public class Capabilities {
         MinecraftForge.EVENT_BUS.register(Capabilities.class);
     }
 
+    @SuppressWarnings("unused")
     @SubscribeEvent
     public static void attachEntityCapability(AttachCapabilitiesEvent<Entity> e) {
         if (e.getObject() instanceof PlayerEntity) {
