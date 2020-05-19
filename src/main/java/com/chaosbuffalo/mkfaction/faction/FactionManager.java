@@ -12,7 +12,6 @@ import net.minecraft.util.ResourceLocation;
 import java.util.Map;
 
 public class FactionManager extends JsonReloadListener {
-    public static final FactionManager INSTANCE = new FactionManager();
 
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
