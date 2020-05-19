@@ -23,6 +23,9 @@ public class PacketHandler {
 
 
     public static void registerMessages(SimpleChannel channel){
-
+        channel.registerMessage(1, MKFactionUpdatePacket.class,
+                MKFactionUpdatePacket::toBytes,
+                MKFactionUpdatePacket::new,
+                MKFactionUpdatePacket::handle);
     }
 }
