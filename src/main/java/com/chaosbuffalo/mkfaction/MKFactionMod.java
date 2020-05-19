@@ -2,9 +2,12 @@ package com.chaosbuffalo.mkfaction;
 
 import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
 import com.chaosbuffalo.mkfaction.faction.FactionManager;
+import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -64,13 +67,14 @@ public class MKFactionMod
     public MKFactionMod() {
         proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::aboutToStart);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
 
     private void setup(final FMLCommonSetupEvent event){
         LOGGER.info("Common setup");
+        PacketHandler.setupHandler();
         TargetingHooks.registerHooks();
         Capabilities.registerCapabilities();
     }
@@ -80,7 +84,8 @@ public class MKFactionMod
         proxy.setupResourceManagers((IReloadableResourceManager) event.getMinecraftSupplier().get().getResourceManager());
     }
 
-    private void aboutToStart(FMLServerAboutToStartEvent event){
+    @SubscribeEvent
+    public void aboutToStart(FMLServerAboutToStartEvent event){
         LOGGER.info("Server bout to start");
         proxy.setupResourceManagers(event.getServer().getResourceManager());
     }

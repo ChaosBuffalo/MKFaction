@@ -13,7 +13,7 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
     private ResourceLocation name;
     private final Set<ResourceLocation> allies;
     private final Set<ResourceLocation> enemies;
-    private final int defaultPlayerScore;
+    private int defaultPlayerScore;
 
     public MKFaction(ResourceLocation name, int defaultPlayerScore){
         setRegistryName(name);
@@ -24,6 +24,18 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
 
     public int getDefaultPlayerScore(){
         return defaultPlayerScore;
+    }
+
+    public void setDefaultPlayerScore(int defaultPlayerScore) {
+        this.defaultPlayerScore = defaultPlayerScore;
+    }
+
+    public void clearAllies(){
+        allies.clear();
+    }
+
+    public void clearEnemies(){
+        enemies.clear();
     }
 
     public Set<ResourceLocation> getAllies() {
