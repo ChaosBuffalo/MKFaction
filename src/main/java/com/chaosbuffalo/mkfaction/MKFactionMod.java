@@ -1,6 +1,7 @@
 package com.chaosbuffalo.mkfaction;
 
 import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.faction.FactionDefaultManager;
 import com.chaosbuffalo.mkfaction.faction.FactionManager;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 
 
 @Mod(MKFactionMod.MODID)
@@ -21,6 +23,7 @@ public class MKFactionMod
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "mkfaction";
     private FactionManager factionManager;
+    private FactionDefaultManager factionDefaultManager;
 
     public MKFactionMod() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -30,10 +33,19 @@ public class MKFactionMod
 
 
     private void setup(final FMLCommonSetupEvent event){
-        LOGGER.info("Common setup");
         PacketHandler.setupHandler();
         TargetingHooks.registerHooks();
         Capabilities.registerCapabilities();
+    }
+
+    @Nullable
+    public FactionManager getFactionManager() {
+        return factionManager;
+    }
+
+    @Nullable
+    public FactionDefaultManager getFactionDefaultManager() {
+        return factionDefaultManager;
     }
 
     private void clientSetup(final FMLClientSetupEvent event){
@@ -42,8 +54,9 @@ public class MKFactionMod
 
     @SubscribeEvent
     public void aboutToStart(FMLServerAboutToStartEvent event){
-        LOGGER.info("Server bout to start");
         factionManager = new FactionManager(event.getServer());
+        factionDefaultManager = new FactionDefaultManager();
         event.getServer().getResourceManager().addReloadListener(factionManager);
+        event.getServer().getResourceManager().addReloadListener(factionDefaultManager);
     }
 }

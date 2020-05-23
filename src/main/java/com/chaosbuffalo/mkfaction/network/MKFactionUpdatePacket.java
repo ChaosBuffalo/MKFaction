@@ -1,7 +1,7 @@
 package com.chaosbuffalo.mkfaction.network;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
-import com.chaosbuffalo.mkfaction.MKFactionRegistry;
+import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;

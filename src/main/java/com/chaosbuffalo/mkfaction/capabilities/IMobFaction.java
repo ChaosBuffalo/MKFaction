@@ -16,6 +16,6 @@ public interface IMobFaction extends INBTSerializable<CompoundNBT> {
 
     Targeting.TargetRelation getRelationToMob(LivingEntity entity);
 
-
+    LivingEntity getEntity();
 
 }

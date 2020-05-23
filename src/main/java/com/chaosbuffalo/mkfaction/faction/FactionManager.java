@@ -1,7 +1,7 @@
 package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
-import com.chaosbuffalo.mkfaction.MKFactionRegistry;
+import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.network.MKFactionUpdatePacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import com.google.gson.*;
@@ -15,12 +15,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.util.Map;
 
 public class FactionManager extends JsonReloadListener {
-    private MinecraftServer server;
+    private final MinecraftServer server;
 
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
@@ -54,6 +53,7 @@ public class FactionManager extends JsonReloadListener {
                 updatePacket, NetworkDirection.PLAY_TO_CLIENT));
     }
 
+    @SuppressWarnings("unused")
     @SubscribeEvent
     public void playerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event){
         MKFactionMod.LOGGER.info("Player logged in faction manager");

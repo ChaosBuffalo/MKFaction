@@ -1,5 +1,6 @@
-package com.chaosbuffalo.mkfaction;
+package com.chaosbuffalo.mkfaction.event;
 
+import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -10,7 +11,7 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 import javax.annotation.Nullable;
 
-@Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid=MKFactionMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class MKFactionRegistry {
     public static IForgeRegistry<MKFaction> FACTION_REGISTRY = null;
 
@@ -22,11 +23,13 @@ public class MKFactionRegistry {
     @SuppressWarnings("unused")
     @SubscribeEvent
     public static void createRegistries(RegistryEvent.NewRegistry event) {
+        MKFactionMod.LOGGER.info("Creating Faction Registry");
         FACTION_REGISTRY = new RegistryBuilder<MKFaction>()
                 .setName(new ResourceLocation(MKFactionMod.MODID, "factions"))
                 .setType(MKFaction.class)
                 .setIDRange(0, Integer.MAX_VALUE - 1)
                 .allowModification()
                 .create();
+        MKFactionMod.LOGGER.info("Registry created");
     }
 }

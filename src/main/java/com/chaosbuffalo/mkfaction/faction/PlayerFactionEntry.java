@@ -1,12 +1,12 @@
 package com.chaosbuffalo.mkfaction.faction;
 
-import com.chaosbuffalo.mkfaction.MKFactionRegistry;
+import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
 
-import static com.chaosbuffalo.mkfaction.capabilities.MobFactionHandler.INVALID_FACTION;
+import static com.chaosbuffalo.mkfaction.faction.MKFaction.INVALID_FACTION;
 
 
 public class PlayerFactionEntry implements INBTSerializable<CompoundNBT> {

@@ -27,5 +27,9 @@ public class PacketHandler {
                 MKFactionUpdatePacket::toBytes,
                 MKFactionUpdatePacket::new,
                 MKFactionUpdatePacket::handle);
+        channel.registerMessage(2, MobFactionUpdatePacket.class,
+                MobFactionUpdatePacket::toBytes,
+                MobFactionUpdatePacket::new,
+                MobFactionUpdatePacket::handle);
     }
 }
