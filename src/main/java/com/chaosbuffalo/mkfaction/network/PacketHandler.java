@@ -31,5 +31,9 @@ public class PacketHandler {
                 MobFactionUpdatePacket::toBytes,
                 MobFactionUpdatePacket::new,
                 MobFactionUpdatePacket::handle);
+        channel.registerMessage(3, PlayerFactionUpdatePacket.class,
+                PlayerFactionUpdatePacket::toBytes,
+                PlayerFactionUpdatePacket::new,
+                PlayerFactionUpdatePacket::handle);
     }
 }

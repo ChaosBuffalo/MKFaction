@@ -77,7 +77,7 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'mkfaction', '--all', '--output', file('src/generated/resources/')
 
             mods {
                 examplemod {
@@ -90,8 +90,8 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.63'
-
-compile "curse.maven:targeting_api:2958155"
+    compile "curse.maven:targeting_api:2958155"
+    compile "curse.maven:mk-widgets:2955593"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

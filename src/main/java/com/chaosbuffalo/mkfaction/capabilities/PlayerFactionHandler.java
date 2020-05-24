@@ -1,6 +1,5 @@
 package com.chaosbuffalo.mkfaction.capabilities;
 
-import com.chaosbuffalo.mkfaction.capabilities.IPlayerFaction;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -29,6 +28,11 @@ public class PlayerFactionHandler implements IPlayerFaction {
     @Override
     public void attach(PlayerEntity player) {
         this.player = player;
+    }
+
+    @Override
+    public PlayerEntity getPlayer() {
+        return player;
     }
 
     @Override

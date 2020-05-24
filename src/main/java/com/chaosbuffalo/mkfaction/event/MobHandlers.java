@@ -6,6 +6,7 @@ import com.chaosbuffalo.mkfaction.faction.FactionDefaultManager;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.mkfaction.network.MobFactionUpdatePacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
+import com.chaosbuffalo.mkfaction.network.PlayerFactionUpdatePacket;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -32,14 +33,17 @@ public class MobHandlers {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onEntityJoinWorld(EntityJoinWorldEvent event){
         if (!event.getWorld().isRemote){
-            if (event.getEntity() instanceof LivingEntity){
+            if (event.getEntity() instanceof ServerPlayerEntity){
+                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.getEntity();
+                serverPlayer.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY).ifPresent(playerFaction ->
+                        PacketDistributor.PLAYER.with(() -> serverPlayer).send(PacketHandler.getNetworkChannel()
+                                .toVanillaPacket(new PlayerFactionUpdatePacket(playerFaction),
+                                        NetworkDirection.PLAY_TO_CLIENT)));
+            } else if (event.getEntity() instanceof LivingEntity){
                 event.getEntity().getCapability(Capabilities.MOB_FACTION_CAPABILITY).ifPresent(mobFaction ->{
                     if (mobFaction.getFactionName().equals(MKFaction.INVALID_FACTION)){
                         mobFaction.setFactionName(FactionDefaultManager.getFactionForEntity(
                                 event.getEntity().getType().getRegistryName()));
-                        MKFactionMod.LOGGER.info("Set faction for {} to {}",
-                                mobFaction.getEntity(), mobFaction.getFactionName());
-
                     }
                 });
             }

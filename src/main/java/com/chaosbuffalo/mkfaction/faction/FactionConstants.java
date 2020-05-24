@@ -1,6 +1,7 @@
 package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.targeting_api.Targeting;
+import net.minecraft.util.text.TextFormatting;
 
 public class FactionConstants {
 
@@ -20,6 +21,46 @@ public class FactionConstants {
         ALLY,
         VILLAIN,
         SUSPECT
+    }
+
+    public static String translationKeyFromFactionStatus(PlayerFactionStatus status){
+        switch (status){
+            case FRIEND:
+                return "faction_status.friend";
+            case ENEMY:
+                return "faction_status.enemy";
+            case HERO:
+                return "faction_status.hero";
+            case ALLY:
+                return "faction_status.ally";
+            case VILLAIN:
+                return "faction_status.villain";
+            case SUSPECT:
+                return "faction_status.suspect";
+            case UNKNOWN:
+            default:
+                return "faction_status.unknown";
+        }
+    }
+
+    public static TextFormatting colorForFactionStatus(PlayerFactionStatus status){
+        switch (status){
+            case FRIEND:
+                return TextFormatting.AQUA;
+            case ENEMY:
+                return TextFormatting.RED;
+            case HERO:
+                return TextFormatting.GOLD;
+            case ALLY:
+                return TextFormatting.GREEN;
+            case VILLAIN:
+                return TextFormatting.DARK_RED;
+            case SUSPECT:
+                return TextFormatting.DARK_GRAY;
+            case UNKNOWN:
+            default:
+                return TextFormatting.GRAY;
+        }
     }
 
     public static PlayerFactionStatus statusFromFactionAmount(int factionAmount){
