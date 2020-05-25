@@ -28,6 +28,9 @@ public class MKFactionMod
     public static final KeyBinding CON_KEY_BIND = new KeyBinding("key.mkfaction.con.desc",
             GLFW.GLFW_KEY_C,
             "key.mkfaction.category");
+    public static final KeyBinding FACTION_PANEL_KEY_BIND = new KeyBinding("key.mkfaction.panel.desc",
+            GLFW.GLFW_KEY_P,
+            "key.mkfaction.category");
 
     public MKFactionMod() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -45,6 +48,7 @@ public class MKFactionMod
     private void clientSetup(final FMLClientSetupEvent event){
         LOGGER.info("Client setup");
         ClientRegistry.registerKeyBinding(CON_KEY_BIND);
+        ClientRegistry.registerKeyBinding(FACTION_PANEL_KEY_BIND);
     }
 
     @SuppressWarnings("unused")

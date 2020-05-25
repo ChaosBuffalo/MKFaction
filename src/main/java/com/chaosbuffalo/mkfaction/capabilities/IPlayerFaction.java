@@ -1,7 +1,7 @@
 package com.chaosbuffalo.mkfaction.capabilities;
 
-import com.chaosbuffalo.mkfaction.faction.FactionConstants;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
+import com.chaosbuffalo.mkfaction.faction.PlayerFactionStatus;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
@@ -17,7 +17,7 @@ public interface IPlayerFaction extends INBTSerializable<CompoundNBT> {
 
     PlayerEntity getPlayer();
 
-    default FactionConstants.PlayerFactionStatus getFactionStatus(ResourceLocation factionName){
+    default PlayerFactionStatus getFactionStatus(ResourceLocation factionName){
         return getFactionEntry(factionName).getFactionStatus();
     }
 

@@ -32,6 +32,15 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
         this.defaultPlayerScore = defaultPlayerScore;
     }
 
+    public String getTranslationKey(){
+        if (getRegistryName() != null){
+            return String.format("faction.%s.%s.name", getRegistryName().getNamespace(), getRegistryName().getPath());
+        } else {
+            return "faction.mkfaction.invalid.name";
+        }
+
+    }
+
     public int getDefaultPlayerScore(){
         return defaultPlayerScore;
     }

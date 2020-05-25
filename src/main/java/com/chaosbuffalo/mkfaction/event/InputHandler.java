@@ -3,7 +3,8 @@ package com.chaosbuffalo.mkfaction.event;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 
 import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
-import com.chaosbuffalo.mkfaction.faction.FactionConstants;
+import com.chaosbuffalo.mkfaction.client.gui.FactionScreen;
+import com.chaosbuffalo.mkfaction.faction.PlayerFactionStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -94,14 +95,17 @@ public class InputHandler {
                 result.getEntity().getCapability(Capabilities.MOB_FACTION_CAPABILITY).ifPresent(
                         (mobFaction) -> player.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY)
                                 .ifPresent((playerFaction) -> {
-                                    FactionConstants.PlayerFactionStatus status = playerFaction
+                                    PlayerFactionStatus status = playerFaction
                                             .getFactionStatus(mobFaction.getFactionName());
                                     player.sendMessage(new TranslationTextComponent(
-                                            FactionConstants.translationKeyFromFactionStatus(status),
+                                            PlayerFactionStatus.translationKeyFromFactionStatus(status) + ".con",
                                             result.getEntity().getName()).applyTextStyle(
-                                            FactionConstants.colorForFactionStatus(status)));
+                                            PlayerFactionStatus.colorForFactionStatus(status)));
                                 }));
             }
+        }
+        while (MKFactionMod.FACTION_PANEL_KEY_BIND.isPressed()){
+            Minecraft.getInstance().displayGuiScreen(new FactionScreen());
         }
     }
 

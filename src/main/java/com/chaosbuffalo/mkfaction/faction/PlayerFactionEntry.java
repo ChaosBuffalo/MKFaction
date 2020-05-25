@@ -54,11 +54,11 @@ public class PlayerFactionEntry implements INBTSerializable<CompoundNBT> {
     }
 
     public Targeting.TargetRelation getTargetRelationForFaction(){
-        return FactionConstants.defaultTargetRelationFromFactionStatus(getFactionStatus());
+        return PlayerFactionStatus.defaultTargetRelationFromFactionStatus(getFactionStatus());
     }
 
-    public FactionConstants.PlayerFactionStatus getFactionStatus(){
-        return FactionConstants.statusFromFactionAmount(getFactionScore());
+    public PlayerFactionStatus getFactionStatus(){
+        return PlayerFactionStatus.statusFromFactionAmount(getFactionScore());
     }
 
 
