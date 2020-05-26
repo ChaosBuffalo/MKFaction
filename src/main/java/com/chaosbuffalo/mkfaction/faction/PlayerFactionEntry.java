@@ -66,7 +66,7 @@ public class PlayerFactionEntry implements INBTSerializable<CompoundNBT> {
     public CompoundNBT serializeNBT() {
         CompoundNBT tag = new CompoundNBT();
         tag.putInt("factionScore", getFactionScore());
-        return null;
+        return tag;
     }
 
     @Override
