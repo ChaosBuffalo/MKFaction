@@ -7,10 +7,7 @@ import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -58,8 +55,6 @@ public class MobFactionHandler implements IMobFaction {
                         updatePacket, NetworkDirection.PLAY_TO_CLIENT));
     }
 
-
-    @Override
     public void attach(LivingEntity entity) {
         this.entity = entity;
     }
@@ -93,26 +88,6 @@ public class MobFactionHandler implements IMobFaction {
             setFactionNameInternal(new ResourceLocation(nbt.getString("factionName")));
         } else {
             setFactionNameInternal(MKFaction.INVALID_FACTION);
-        }
-    }
-
-    public static class Storage implements Capability.IStorage<IMobFaction> {
-
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<IMobFaction> capability, IMobFaction instance, Direction side) {
-            if (instance == null){
-                return null;
-            }
-            return instance.serializeNBT();
-        }
-
-        @Override
-        public void readNBT(Capability<IMobFaction> capability, IMobFaction instance, Direction side, INBT nbt) {
-            if (nbt instanceof CompoundNBT && instance != null) {
-                CompoundNBT tag = (CompoundNBT) nbt;
-                instance.deserializeNBT(tag);
-            }
         }
     }
 }

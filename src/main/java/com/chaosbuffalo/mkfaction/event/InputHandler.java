@@ -6,17 +6,21 @@ import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
 import com.chaosbuffalo.mkfaction.client.gui.FactionScreen;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionStatus;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.*;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -24,15 +28,27 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
-@Mod.EventBusSubscriber(modid=MKFactionMod.MODID, bus=Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid=MKFactionMod.MODID, bus=Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class InputHandler {
 
+    public static final KeyBinding CON_KEY_BIND = new KeyBinding("key.mkfaction.con.desc",
+            GLFW.GLFW_KEY_C,
+            "key.mkfaction.category");
+    public static final KeyBinding FACTION_PANEL_KEY_BIND = new KeyBinding("key.mkfaction.panel.desc",
+            GLFW.GLFW_KEY_P,
+            "key.mkfaction.category");
+
+    public static void registerKeybinds() {
+        ClientRegistry.registerKeyBinding(CON_KEY_BIND);
+        ClientRegistry.registerKeyBinding(FACTION_PANEL_KEY_BIND);
+    }
+
     public static <E extends Entity> EntityRayTraceResult rayTraceEntities(Class<E> clazz, World world,
-                                                                     Vec3d from, Vec3d to,
-                                                                     Vec3d aaExpansion,
-                                                                     float aaGrowth,
-                                                                     float entityExpansion,
-                                                                     final Predicate<E> filter) {
+                                                                           Vec3d from, Vec3d to,
+                                                                           Vec3d aaExpansion,
+                                                                           float aaGrowth,
+                                                                           float entityExpansion,
+                                                                           final Predicate<E> filter) {
         Entity nearest = null;
         double distance = 0;
         Vec3d hitVec = null;
@@ -61,8 +77,8 @@ public class InputHandler {
 
     @Nullable
     public static <E extends Entity> EntityRayTraceResult getLookingAtNonPlayer(Class<E> clazz,
-                                                                          final Entity mainEntity,
-                                                                          double distance) {
+                                                                                final Entity mainEntity,
+                                                                                double distance) {
         Predicate<E> finalFilter = e -> e != mainEntity &&
                 !(e instanceof PlayerEntity) &&
                 e.canBeCollidedWith() && clazz.isInstance(e);
@@ -80,38 +96,40 @@ public class InputHandler {
 
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
-    public static void onMouseEvent(InputEvent.MouseInputEvent event){
+    public static void onMouseEvent(InputEvent.MouseInputEvent event) {
         handleInputEvent();
     }
 
-    private static void handleInputEvent(){
-        while (MKFactionMod.CON_KEY_BIND.isPressed()){
+    private static void handleInputEvent() {
+        while (CON_KEY_BIND.isPressed()) {
             PlayerEntity player = Minecraft.getInstance().player;
-            if (player == null){
+            if (player == null) {
                 return;
             }
             EntityRayTraceResult result = getLookingAtNonPlayer(LivingEntity.class, player, 30.0f);
-            if (result != null){
+            if (result != null) {
                 result.getEntity().getCapability(Capabilities.MOB_FACTION_CAPABILITY).ifPresent(
                         (mobFaction) -> player.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY)
                                 .ifPresent((playerFaction) -> {
-                                    PlayerFactionStatus status = playerFaction
-                                            .getFactionStatus(mobFaction.getFactionName());
-                                    player.sendMessage(new TranslationTextComponent(
-                                            PlayerFactionStatus.translationKeyFromFactionStatus(status) + ".con",
-                                            result.getEntity().getName()).applyTextStyle(
-                                            PlayerFactionStatus.colorForFactionStatus(status)));
+                                    PlayerFactionStatus status = playerFaction.getFactionStatus(mobFaction.getFactionName());
+                                    ITextComponent msg = new TranslationTextComponent(status.getTranslationKey() + ".con",
+                                            result.getEntity().getName())
+                                            .applyTextStyle(status.getColor());
+                                    if (player.isCreative()) {
+                                        msg.appendText(String.format(" (%s)", mobFaction.getFactionName()));
+                                    }
+                                    player.sendMessage(msg);
                                 }));
             }
         }
-        while (MKFactionMod.FACTION_PANEL_KEY_BIND.isPressed()){
+        while (FACTION_PANEL_KEY_BIND.isPressed()) {
             Minecraft.getInstance().displayGuiScreen(new FactionScreen());
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
-    public static void onEvent(InputEvent.KeyInputEvent event){
+    public static void onEvent(InputEvent.KeyInputEvent event) {
         handleInputEvent();
     }
 }
