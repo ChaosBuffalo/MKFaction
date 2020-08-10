@@ -1,7 +1,7 @@
 package com.chaosbuffalo.mkfaction.event;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.capabilities.MobFactionProvider;
 import com.chaosbuffalo.mkfaction.capabilities.PlayerFactionProvider;
 import net.minecraft.entity.Entity;
@@ -19,9 +19,9 @@ public class CapabilityHandler {
     @SubscribeEvent
     public static void attachEntityCapability(AttachCapabilitiesEvent<Entity> e) {
         if (e.getObject() instanceof PlayerEntity) {
-            e.addCapability(Capabilities.PLAYER_FACTION_CAP_ID, new PlayerFactionProvider((PlayerEntity) e.getObject()));
+            e.addCapability(FactionCapabilities.PLAYER_FACTION_CAP_ID, new PlayerFactionProvider((PlayerEntity) e.getObject()));
         } else if (e.getObject() instanceof LivingEntity){
-            e.addCapability(Capabilities.MOB_FACTION_CAP_ID, new MobFactionProvider((LivingEntity) e.getObject()));
+            e.addCapability(FactionCapabilities.MOB_FACTION_CAP_ID, new MobFactionProvider((LivingEntity) e.getObject()));
         }
     }
 }

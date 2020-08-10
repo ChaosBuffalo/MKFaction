@@ -9,14 +9,14 @@ import java.util.Comparator;
 public enum PlayerFactionStatus {
     VILLAIN(FactionConstants.VILLAIN_THRESHOLD, "faction_status.villain", TextFormatting.DARK_RED, Targeting.TargetRelation.ENEMY),
     ENEMY(FactionConstants.ENEMY_THRESHOLD, "faction_status.enemy", TextFormatting.RED, Targeting.TargetRelation.ENEMY),
-    UNKNOWN(FactionConstants.WARY_THRESHOLD, "faction_status.unknown", TextFormatting.GRAY, Targeting.TargetRelation.NEUTRAL),
-    SUSPECT(FactionConstants.TRUE_NEUTRAL, "faction_status.suspect", TextFormatting.DARK_GRAY, Targeting.TargetRelation.NEUTRAL),
+    SUSPECT(FactionConstants.WARY_THRESHOLD, "faction_status.suspect", TextFormatting.DARK_GRAY, Targeting.TargetRelation.NEUTRAL),
+    UNKNOWN(FactionConstants.TRUE_NEUTRAL, "faction_status.unknown", TextFormatting.GRAY, Targeting.TargetRelation.NEUTRAL),
     FRIEND(FactionConstants.FRIENDLY_THRESHOLD, "faction_status.friend", TextFormatting.AQUA, Targeting.TargetRelation.NEUTRAL),
     ALLY(FactionConstants.ALLY_THRESHOLD, "faction_status.ally", TextFormatting.GREEN, Targeting.TargetRelation.FRIEND),
     HERO(FactionConstants.HERO_THRESHOLD, "faction_status.hero", TextFormatting.GOLD, Targeting.TargetRelation.FRIEND);
 
     private static final PlayerFactionStatus[] sortedStatus = Arrays.stream(values())
-            .sorted(Comparator.comparingInt(PlayerFactionStatus::getThreshold).reversed())
+            .sorted(Comparator.comparingInt(PlayerFactionStatus::getThreshold))
             .toArray(PlayerFactionStatus[]::new);
 
     final int threshold;
@@ -48,11 +48,19 @@ public enum PlayerFactionStatus {
     }
 
     public static PlayerFactionStatus forScore(int factionAmount) {
+        PlayerFactionStatus status = PlayerFactionStatus.UNKNOWN;
         for (PlayerFactionStatus playerFactionStatus : sortedStatus) {
-            if (factionAmount >= playerFactionStatus.getThreshold()) {
-                return playerFactionStatus;
+            int threshold = playerFactionStatus.getThreshold();
+            if (threshold < 0) {
+                if (factionAmount <= threshold && threshold < status.getThreshold()) {
+                    status = playerFactionStatus;
+                }
+            } else {
+                if (factionAmount >= threshold && threshold >= status.getThreshold()) {
+                    status = playerFactionStatus;
+                }
             }
         }
-        return VILLAIN;
+        return status;
     }
 }

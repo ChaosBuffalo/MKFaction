@@ -22,18 +22,18 @@ public class MobFactionProvider implements ICapabilitySerializable<CompoundNBT> 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return Capabilities.MOB_FACTION_CAPABILITY.orEmpty(cap, LazyOptional.of(() -> data));
+        return FactionCapabilities.MOB_FACTION_CAPABILITY.orEmpty(cap, LazyOptional.of(() -> data));
     }
 
     @Override
     public CompoundNBT serializeNBT() {
-        return (CompoundNBT) Capabilities.MOB_FACTION_CAPABILITY.getStorage().writeNBT(
-                Capabilities.MOB_FACTION_CAPABILITY, data, null);
+        return (CompoundNBT) FactionCapabilities.MOB_FACTION_CAPABILITY.getStorage().writeNBT(
+                FactionCapabilities.MOB_FACTION_CAPABILITY, data, null);
     }
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        Capabilities.MOB_FACTION_CAPABILITY.getStorage().readNBT(
-                Capabilities.MOB_FACTION_CAPABILITY, data, null, nbt);
+        FactionCapabilities.MOB_FACTION_CAPABILITY.getStorage().readNBT(
+                FactionCapabilities.MOB_FACTION_CAPABILITY, data, null, nbt);
     }
 }

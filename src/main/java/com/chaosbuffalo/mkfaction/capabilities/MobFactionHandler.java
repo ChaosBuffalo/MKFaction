@@ -6,6 +6,7 @@ import com.chaosbuffalo.mkfaction.network.MobFactionUpdatePacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -18,7 +19,7 @@ public class MobFactionHandler implements IMobFaction {
     private MKFaction faction;
     private LivingEntity entity;
 
-    public MobFactionHandler(){
+    public MobFactionHandler() {
         factionName = MKFaction.INVALID_FACTION;
         entity = null;
     }
@@ -34,25 +35,24 @@ public class MobFactionHandler implements IMobFaction {
         return factionName;
     }
 
-    private void setFactionNameInternal(ResourceLocation factionName){
+    private void setFactionNameInternal(ResourceLocation factionName) {
         this.factionName = factionName;
-        if (!factionName.equals(MKFaction.INVALID_FACTION)){
+        if (!factionName.equals(MKFaction.INVALID_FACTION)) {
             this.faction = MKFactionRegistry.getFaction(factionName);
         }
     }
 
     public void setFactionName(ResourceLocation factionName) {
         setFactionNameInternal(factionName);
-        if (!getEntity().getEntityWorld().isRemote){
+        if (!getEntity().getEntityWorld().isRemote) {
             syncToAllTracking();
         }
     }
 
-    public void syncToAllTracking(){
+    public void syncToAllTracking() {
         MobFactionUpdatePacket updatePacket = new MobFactionUpdatePacket(this);
         PacketDistributor.TRACKING_ENTITY.with(this::getEntity)
-                .send(PacketHandler.getNetworkChannel().toVanillaPacket(
-                        updatePacket, NetworkDirection.PLAY_TO_CLIENT));
+                .send(PacketHandler.getNetworkChannel().toVanillaPacket(updatePacket, NetworkDirection.PLAY_TO_CLIENT));
     }
 
     public void attach(LivingEntity entity) {
@@ -65,13 +65,19 @@ public class MobFactionHandler implements IMobFaction {
     }
 
     @Override
-    public Targeting.TargetRelation getRelationToMob(LivingEntity otherEntity) {
+    public Targeting.TargetRelation getRelationToEntity(LivingEntity otherEntity) {
         MKFaction faction = getFaction();
-        if (faction == null){
+        if (faction == null) {
             return Targeting.TargetRelation.UNHANDLED;
         }
-        return otherEntity.getCapability(Capabilities.MOB_FACTION_CAPABILITY).map((mobFaction) ->
-                faction.getNonPlayerEntityRelationship(otherEntity, mobFaction.getFactionName()))
+
+        if (otherEntity instanceof PlayerEntity) {
+            return otherEntity.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY)
+                    .map(playerFaction -> playerFaction.getFactionRelation(factionName))
+                    .orElse(Targeting.TargetRelation.UNHANDLED);
+        }
+        return otherEntity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)
+                .map(mobFaction -> faction.getNonPlayerEntityRelationship(otherEntity, mobFaction.getFactionName()))
                 .orElse(Targeting.TargetRelation.UNHANDLED);
     }
 

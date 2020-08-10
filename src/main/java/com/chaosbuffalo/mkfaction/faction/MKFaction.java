@@ -1,7 +1,7 @@
 package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -82,7 +82,7 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         if (entity instanceof PlayerEntity){
             return false;
         } else {
-            return entity.getCapability(Capabilities.MOB_FACTION_CAPABILITY)
+            return entity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)
                     .map((cap) -> cap.getFactionName().equals(getRegistryName())).orElse(false);
         }
     }

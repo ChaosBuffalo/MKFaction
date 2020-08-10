@@ -1,6 +1,6 @@
 package com.chaosbuffalo.mkfaction;
 
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.capabilities.PlayerFactionHandler;
 import com.chaosbuffalo.mkfaction.command.FactionCommand;
 import com.chaosbuffalo.mkfaction.event.InputHandler;
@@ -40,7 +40,7 @@ public class MKFactionMod {
         LOGGER.info("MKFactionMod.setup");
         PacketHandler.setupHandler();
         TargetingHooks.registerHooks();
-        Capabilities.registerCapabilities();
+        FactionCapabilities.registerCapabilities();
         FactionCommand.registerArgumentTypes();
     }
 

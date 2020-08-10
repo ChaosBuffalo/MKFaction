@@ -1,7 +1,7 @@
 package com.chaosbuffalo.mkfaction.command;
 
 import com.chaosbuffalo.mkcore.utils.TextUtils;
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
 import com.mojang.brigadier.Command;
@@ -67,7 +67,7 @@ public class FactionCommand {
         ResourceLocation factionId = ctx.getArgument("faction", ResourceLocation.class);
         int amount = IntegerArgumentType.getInteger(ctx, "amount");
 
-        player.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
+        player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
             faction.getFactionEntry(factionId).ifPresent(entry -> {
                 entry.incrementFaction(amount);
                 String line = describeEntry(entry);
@@ -83,7 +83,7 @@ public class FactionCommand {
         ResourceLocation factionId = ctx.getArgument("faction", ResourceLocation.class);
         int amount = IntegerArgumentType.getInteger(ctx, "amount");
 
-        player.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
+        player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
             faction.getFactionEntry(factionId).ifPresent(entry -> {
                 entry.setFactionScore(amount);
                 String line = describeEntry(entry);
@@ -98,7 +98,7 @@ public class FactionCommand {
         ServerPlayerEntity player = ctx.getSource().asPlayer();
         ResourceLocation factionId = ctx.getArgument("faction", ResourceLocation.class);
 
-        player.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
+        player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
             faction.getFactionEntry(factionId).ifPresent(entry -> {
                 String line = describeEntry(entry);
                 TextUtils.sendChatMessage(player, line);
@@ -112,7 +112,7 @@ public class FactionCommand {
     static int showAllFactions(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
         ServerPlayerEntity player = ctx.getSource().asPlayer();
 
-        player.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
+        player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
             faction.getFactionMap().forEach((name, entry) -> {
                 String line = describeEntry(entry);
                 TextUtils.sendChatMessage(player, line);

@@ -2,7 +2,7 @@ package com.chaosbuffalo.mkfaction.event;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.client.gui.FactionScreen;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionStatus;
 import net.minecraft.client.Minecraft;
@@ -108,8 +108,8 @@ public class InputHandler {
             }
             EntityRayTraceResult result = getLookingAtNonPlayer(LivingEntity.class, player, 30.0f);
             if (result != null) {
-                result.getEntity().getCapability(Capabilities.MOB_FACTION_CAPABILITY).ifPresent(
-                        (mobFaction) -> player.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY)
+                result.getEntity().getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY).ifPresent(
+                        (mobFaction) -> player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY)
                                 .ifPresent((playerFaction) -> {
                                     PlayerFactionStatus status = playerFaction.getFactionStatus(mobFaction.getFactionName());
                                     ITextComponent msg = new TranslationTextComponent(status.getTranslationKey() + ".con",

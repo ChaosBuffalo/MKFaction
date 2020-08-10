@@ -12,7 +12,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
 
-public class Capabilities {
+public class FactionCapabilities {
 
     public static ResourceLocation PLAYER_FACTION_CAP_ID = new ResourceLocation(MKFactionMod.MODID,
             "player_faction_data");
