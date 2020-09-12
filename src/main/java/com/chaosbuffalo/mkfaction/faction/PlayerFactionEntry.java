@@ -1,34 +1,37 @@
 package com.chaosbuffalo.mkfaction.faction;
 
+import com.chaosbuffalo.mkcore.sync.IMKSerializable;
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+
+import java.util.function.Consumer;
 
 import static com.chaosbuffalo.mkfaction.faction.MKFaction.INVALID_FACTION;
 
 
-public class PlayerFactionEntry implements INBTSerializable<CompoundNBT> {
+public class PlayerFactionEntry implements IMKSerializable<CompoundNBT> {
 
     private int factionScore;
     private final ResourceLocation factionName;
-    public static final PlayerFactionEntry DEFAULT_ENTRY = new PlayerFactionEntry(INVALID_FACTION);
+    private PlayerFactionStatus factionStatus;
+    private Consumer<PlayerFactionEntry> dirtyNotifier;
 
-    public PlayerFactionEntry(ResourceLocation factionName){
+    public PlayerFactionEntry(ResourceLocation factionName) {
         this.factionName = factionName;
-        factionScore = 0;
+        setFactionScore(0);
     }
 
-    public void setToDefaultFactionScore(){
-        if (factionName.equals(INVALID_FACTION)){
-            factionScore = 0;
+    public void setToDefaultFactionScore() {
+        if (factionName.equals(INVALID_FACTION)) {
+            setFactionScore(0);
         } else {
             MKFaction faction = MKFactionRegistry.getFaction(factionName);
-            if (faction != null){
-                factionScore = faction.getDefaultPlayerScore();
+            if (faction != null) {
+                setFactionScore(faction.getDefaultPlayerScore());
             } else {
-                factionScore = 0;
+                setFactionScore(0);
             }
         }
     }
@@ -43,36 +46,48 @@ public class PlayerFactionEntry implements INBTSerializable<CompoundNBT> {
 
     public void setFactionScore(int factionScore) {
         this.factionScore = factionScore;
+        factionStatus = PlayerFactionStatus.forScore(factionScore);
+        markDirty();
     }
 
-    public void incrementFaction(int toAdd){
-        factionScore += toAdd;
+    public void incrementFaction(int toAdd) {
+        setFactionScore(factionScore + toAdd);
     }
 
-    public void decrementFaction(int toSub){
-        factionScore -= toSub;
+    public void decrementFaction(int toSub) {
+        setFactionScore(factionScore - toSub);
     }
 
-    public Targeting.TargetRelation getTargetRelationForFaction(){
-        return PlayerFactionStatus.defaultTargetRelationFromFactionStatus(getFactionStatus());
+    public Targeting.TargetRelation getTargetRelation() {
+        return getFactionStatus().getRelation();
     }
 
-    public PlayerFactionStatus getFactionStatus(){
-        return PlayerFactionStatus.statusFromFactionAmount(getFactionScore());
+    public PlayerFactionStatus getFactionStatus() {
+        return factionStatus;
     }
-
 
     @Override
-    public CompoundNBT serializeNBT() {
+    public CompoundNBT serialize() {
         CompoundNBT tag = new CompoundNBT();
         tag.putInt("factionScore", getFactionScore());
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
-        if (nbt.contains("factionScore", 3)){
+    public boolean deserialize(CompoundNBT nbt) {
+        if (nbt.contains("factionScore")) {
             setFactionScore(nbt.getInt("factionScore"));
+        }
+        return true;
+    }
+
+    public void setDirtyNotifier(Consumer<PlayerFactionEntry> notifier) {
+        dirtyNotifier = notifier;
+    }
+
+    private void markDirty() {
+        if (dirtyNotifier != null) {
+            dirtyNotifier.accept(this);
         }
     }
 }

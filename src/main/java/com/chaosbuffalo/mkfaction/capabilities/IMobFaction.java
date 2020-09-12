@@ -12,9 +12,7 @@ public interface IMobFaction extends INBTSerializable<CompoundNBT> {
 
     void setFactionName(ResourceLocation factionName);
 
-    void attach(LivingEntity entity);
-
-    Targeting.TargetRelation getRelationToMob(LivingEntity entity);
+    Targeting.TargetRelation getRelationToEntity(LivingEntity entity);
 
     LivingEntity getEntity();
 

@@ -1,21 +1,18 @@
 package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MKFaction implements IForgeRegistryEntry<MKFaction> {
-    public static final ResourceLocation INVALID_FACTION = new ResourceLocation(MKFactionMod.MODID,
-            "faction.invalid");
-    private ResourceLocation name;
+public class MKFaction extends ForgeRegistryEntry<MKFaction> {
+    public static final ResourceLocation INVALID_FACTION = new ResourceLocation(MKFactionMod.MODID, "faction.invalid");
     private final Set<ResourceLocation> allies;
     private final Set<ResourceLocation> enemies;
     private int defaultPlayerScore;
@@ -85,7 +82,7 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
         if (entity instanceof PlayerEntity){
             return false;
         } else {
-            return entity.getCapability(Capabilities.MOB_FACTION_CAPABILITY)
+            return entity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)
                     .map((cap) -> cap.getFactionName().equals(getRegistryName())).orElse(false);
         }
     }
@@ -100,22 +97,5 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
         } else {
             return Targeting.TargetRelation.NEUTRAL;
         }
-    }
-
-    @Override
-    public MKFaction setRegistryName(ResourceLocation name) {
-        this.name = name;
-        return this;
-    }
-
-    @Nullable
-    @Override
-    public ResourceLocation getRegistryName() {
-        return name;
-    }
-
-    @Override
-    public Class<MKFaction> getRegistryType() {
-        return MKFaction.class;
     }
 }
