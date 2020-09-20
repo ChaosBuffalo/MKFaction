@@ -1,33 +1,45 @@
 package com.chaosbuffalo.mkfaction.capabilities;
 
+import com.chaosbuffalo.mkcore.MKCore;
+import com.chaosbuffalo.mkcore.core.MKPlayerData;
+import com.chaosbuffalo.mkcore.core.persona.IPersonaExtension;
+import com.chaosbuffalo.mkcore.core.persona.IPersonaExtensionProvider;
+import com.chaosbuffalo.mkcore.core.persona.Persona;
+import com.chaosbuffalo.mkcore.sync.SyncMapUpdater;
+import com.chaosbuffalo.mkfaction.MKFactionMod;
+import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.InterModComms;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class PlayerFactionHandler implements IPlayerFaction {
 
-    private final HashMap<ResourceLocation, PlayerFactionEntry> factionMap;
     private PlayerEntity player;
+    private MKPlayerData playerData;
 
-    public PlayerFactionHandler(){
-        this.factionMap = new HashMap<>();
+    public PlayerFactionHandler() {
     }
 
-    @Override
-    public HashMap<ResourceLocation, PlayerFactionEntry> getFactionMap() {
-        return factionMap;
-    }
-
-    @Override
     public void attach(PlayerEntity player) {
+        // Do not attempt to access any persona-specific data here because at this time
+        // it's impossible to get a copy of MKPlayerData
         this.player = player;
+    }
+
+    @Override
+    public Map<ResourceLocation, PlayerFactionEntry> getFactionMap() {
+        return getPersonaData().getFactionMap();
+    }
+
+    public Optional<PlayerFactionEntry> getFactionEntry(ResourceLocation factionName) {
+        return Optional.ofNullable(getPersonaData().getFactionEntry(factionName));
     }
 
     @Override
@@ -35,48 +47,119 @@ public class PlayerFactionHandler implements IPlayerFaction {
         return player;
     }
 
+    private MKPlayerData getPlayerData() {
+        if (playerData == null) {
+            playerData = MKCore.getPlayer(player).orElseThrow(IllegalStateException::new);
+        }
+        return playerData;
+    }
+
+    private PersonaFactionData getPersonaData() {
+        return getPlayerData().getPersonaExtension(PersonaFactionData.class);
+    }
+
     @Override
     public CompoundNBT serializeNBT() {
+        // This would be where global data that is shared across personas would be persisted.
+        // Currently there is none.
         CompoundNBT tag = new CompoundNBT();
-        CompoundNBT factions = new CompoundNBT();
-        for (ResourceLocation key : getFactionMap().keySet()){
-            PlayerFactionEntry entry = getFactionMap().get(key);
-            factions.put(key.toString(), entry.serializeNBT());
-        }
-        tag.put("factions", factions);
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        if (nbt.contains("factions")){
-            CompoundNBT factionsTag = nbt.getCompound("factions");
-            for (String key : factionsTag.keySet()){
-                ResourceLocation factionName = new ResourceLocation(key);
-                PlayerFactionEntry newEntry = new PlayerFactionEntry(factionName);
-                newEntry.deserializeNBT(factionsTag.getCompound(key));
-                factionMap.put(factionName, newEntry);
+    }
+
+    public static class PersonaFactionData implements IPersonaExtension {
+        final static ResourceLocation NAME = new ResourceLocation(MKFactionMod.MODID, "faction_data");
+
+        private final Map<ResourceLocation, PlayerFactionEntry> factionMap = new HashMap<>();
+        private final SyncMapUpdater<ResourceLocation, PlayerFactionEntry> factionUpdater;
+        private final Persona persona;
+
+        public PersonaFactionData(Persona persona) {
+            this.persona = persona;
+            factionUpdater = new SyncMapUpdater<>("factions",
+                    () -> factionMap,
+                    ResourceLocation::toString,
+                    ResourceLocation::tryCreate,
+                    this::createNewEntry
+            );
+            persona.getKnowledge().addSyncPrivate(factionUpdater);
+        }
+
+        private PlayerFactionEntry createNewEntry(ResourceLocation name) {
+            if (name.equals(MKFaction.INVALID_FACTION)) {
+                return null;
             }
+            PlayerFactionEntry entry = new PlayerFactionEntry(name);
+            entry.setDirtyNotifier(this::onDirtyEntry);
+            return entry;
+        }
+
+        public Map<ResourceLocation, PlayerFactionEntry> getFactionMap() {
+            return factionMap;
+        }
+
+        @Nullable
+        private PlayerFactionEntry getFactionEntry(ResourceLocation factionName) {
+            if (factionName.equals(MKFaction.INVALID_FACTION))
+                return null;
+
+            return getFactionMap().computeIfAbsent(factionName, name -> {
+                PlayerFactionEntry newEntry = createNewEntry(name);
+                if (newEntry == null)
+                    return null;
+                newEntry.setToDefaultFactionScore();
+                return newEntry;
+            });
+        }
+
+        private void onDirtyEntry(PlayerFactionEntry entry) {
+            factionUpdater.markDirty(entry.getFactionName());
+        }
+
+        @Override
+        public ResourceLocation getName() {
+            return NAME;
+        }
+
+        @Override
+        public void onPersonaActivated() {
+//            MKFactionMod.LOGGER.info("PersonaFactionData.onPersonaActivated");
+        }
+
+        @Override
+        public void onPersonaDeactivated() {
+//            MKFactionMod.LOGGER.info("PersonaFactionData.onPersonaDeactivated");
+        }
+
+        @Override
+        public CompoundNBT serialize() {
+//            MKFactionMod.LOGGER.info("PersonaFactionData.serialize");
+            CompoundNBT tag = new CompoundNBT();
+            tag.put("factions", factionUpdater.serializeStorage());
+            return tag;
+        }
+
+        @Override
+        public void deserialize(CompoundNBT nbt) {
+//            MKFactionMod.LOGGER.info("PersonaFactionData.deserialize {}", nbt);
+            factionUpdater.deserializeStorage(nbt.getCompound("factions"));
         }
     }
 
-    public static class Storage implements Capability.IStorage<IPlayerFaction> {
+    private static PersonaFactionData createNewPersonaData(Persona persona) {
+        MKFactionMod.LOGGER.info("MKFaction creating new persona data for {}", persona.getPlayerData().getEntity());
+        return new PersonaFactionData(persona);
+    }
 
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<IPlayerFaction> capability, IPlayerFaction instance, Direction side) {
-            if (instance == null){
-                return null;
-            }
-            return instance.serializeNBT();
-        }
-
-        @Override
-        public void readNBT(Capability<IPlayerFaction> capability, IPlayerFaction instance, Direction side, INBT nbt) {
-            if (nbt instanceof CompoundNBT && instance != null) {
-                CompoundNBT tag = (CompoundNBT) nbt;
-                instance.deserializeNBT(tag);
-            }
-        }
+    public static void registerPersonaExtension() {
+        IPersonaExtensionProvider factory = PlayerFactionHandler::createNewPersonaData;
+        // some example code to dispatch IMC to another mod
+        InterModComms.sendTo("mkcore", "register_persona_extension", () -> {
+            MKFactionMod.LOGGER.info("Faction register persona by IMC");
+            return factory;
+        });
     }
 }

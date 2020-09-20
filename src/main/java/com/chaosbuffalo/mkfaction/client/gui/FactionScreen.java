@@ -59,10 +59,9 @@ public class FactionScreen extends MKScreen {
         root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.TOP), factionName);
         root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.LEFT), factionName);
         PlayerFactionStatus factionStatus = entry.getFactionStatus();
-        ITextComponent valueText = new TranslationTextComponent(
-                PlayerFactionStatus.translationKeyFromFactionStatus(factionStatus))
-                .appendText(String.format("(%d)", entry.getFactionScore())).applyTextStyle(
-                        PlayerFactionStatus.colorForFactionStatus(factionStatus));
+        ITextComponent valueText = new TranslationTextComponent(factionStatus.getTranslationKey())
+                .appendText(String.format("(%d)", entry.getFactionScore()))
+                .applyTextStyle(factionStatus.getColor());
         MKText factionValue = new MKText(this.font, valueText, 200, font.FONT_HEIGHT);
         factionValue.setWidth(font.getStringWidth(valueText.getFormattedText()));
         root.addWidget(factionValue);
@@ -94,12 +93,11 @@ public class FactionScreen extends MKScreen {
                 }
             }
             factions.sort(Comparator.comparing(mkFaction -> I18n.format(mkFaction.getTranslationKey())));
-            for (MKFaction faction : factions){
-                MKLayout factionLayout = getFactionEntryLayout(
-                        playerFaction.getFactionEntry(faction.getRegistryName()),
-                        faction,
-                        PANEL_WIDTH - 10);
-                verticalLayout.addWidget(factionLayout);
+            for (MKFaction faction : factions) {
+                playerFaction.getFactionEntry(faction.getRegistryName()).ifPresent(entry -> {
+                    MKLayout factionLayout = getFactionEntryLayout(entry, faction, PANEL_WIDTH - 10);
+                    verticalLayout.addWidget(factionLayout);
+                });
             }
 
         });

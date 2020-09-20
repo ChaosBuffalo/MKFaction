@@ -46,4 +46,10 @@ The MK Faction API adds mmorpg style faction reputation system to Minecraft.
     versionRange="[1.0,)"
     ordering="NONE"
     side="BOTH"
+[[dependencies.mkfaction]]
+    modId="mkcore"
+    mandatory=true
+    versionRange="[0.11,)"
+    ordering="NONE"
+    side="BOTH"
 

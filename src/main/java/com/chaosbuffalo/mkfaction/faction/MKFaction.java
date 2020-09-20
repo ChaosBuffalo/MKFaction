@@ -6,16 +6,13 @@ import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MKFaction implements IForgeRegistryEntry<MKFaction> {
-    public static final ResourceLocation INVALID_FACTION = new ResourceLocation(MKFactionMod.MODID,
-            "faction.invalid");
-    private ResourceLocation name;
+public class MKFaction extends ForgeRegistryEntry<MKFaction> {
+    public static final ResourceLocation INVALID_FACTION = new ResourceLocation(MKFactionMod.MODID, "faction.invalid");
     private final Set<ResourceLocation> allies;
     private final Set<ResourceLocation> enemies;
     private final Set<String> firstNames;
@@ -50,6 +47,14 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
 
     public Set<String> getLastNames() {
         return lastNames;
+    }
+
+    public void addFirstName(String name){
+        firstNames.add(name);
+    }
+
+    public void addLastName(String name){
+        lastNames.add(name);
     }
 
     public int getDefaultPlayerScore(){
@@ -111,30 +116,5 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
         } else {
             return Targeting.TargetRelation.NEUTRAL;
         }
-    }
-
-    @Override
-    public MKFaction setRegistryName(ResourceLocation name) {
-        this.name = name;
-        return this;
-    }
-
-    public void addFirstName(String name){
-        firstNames.add(name);
-    }
-
-    public void addLastName(String name){
-        lastNames.add(name);
-    }
-
-    @Nullable
-    @Override
-    public ResourceLocation getRegistryName() {
-        return name;
-    }
-
-    @Override
-    public Class<MKFaction> getRegistryType() {
-        return MKFaction.class;
     }
 }
