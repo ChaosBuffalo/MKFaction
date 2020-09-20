@@ -22,19 +22,19 @@ public class PlayerFactionProvider implements ICapabilitySerializable<CompoundNB
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return Capabilities.PLAYER_FACTION_CAPABILITY.orEmpty(cap, LazyOptional.of(() -> data));
+        return FactionCapabilities.PLAYER_FACTION_CAPABILITY.orEmpty(cap, LazyOptional.of(() -> data));
     }
 
     @Override
     public CompoundNBT serializeNBT() {
-        return (CompoundNBT) Capabilities.PLAYER_FACTION_CAPABILITY.getStorage().writeNBT(
-                Capabilities.PLAYER_FACTION_CAPABILITY, data, null);
+        return (CompoundNBT) FactionCapabilities.PLAYER_FACTION_CAPABILITY.getStorage().writeNBT(
+                FactionCapabilities.PLAYER_FACTION_CAPABILITY, data, null);
     }
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        Capabilities.PLAYER_FACTION_CAPABILITY.getStorage().readNBT(
-                Capabilities.PLAYER_FACTION_CAPABILITY, data, null, nbt);
+        FactionCapabilities.PLAYER_FACTION_CAPABILITY.getStorage().readNBT(
+                FactionCapabilities.PLAYER_FACTION_CAPABILITY, data, null, nbt);
     }
 
 

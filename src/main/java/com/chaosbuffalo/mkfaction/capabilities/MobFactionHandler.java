@@ -75,7 +75,7 @@ public class MobFactionHandler implements IMobFaction {
         if (faction == null){
             return Targeting.TargetRelation.UNHANDLED;
         }
-        return otherEntity.getCapability(Capabilities.MOB_FACTION_CAPABILITY).map((mobFaction) ->
+        return otherEntity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY).map((mobFaction) ->
                 faction.getNonPlayerEntityRelationship(otherEntity, mobFaction.getFactionName()))
                 .orElse(Targeting.TargetRelation.UNHANDLED);
     }

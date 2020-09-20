@@ -1,8 +1,7 @@
 package com.chaosbuffalo.mkfaction.network;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
-import com.chaosbuffalo.mkfaction.capabilities.IMobFaction;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.capabilities.IPlayerFaction;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
 import net.minecraft.client.Minecraft;
@@ -58,7 +57,7 @@ public class PlayerFactionUpdatePacket {
             if (world != null){
                 Entity entity = world.getPlayerByUuid(playerId);
                 if (entity != null){
-                    entity.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY).ifPresent(playerFaction ->{
+                    entity.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(playerFaction ->{
                         for (Map.Entry<ResourceLocation, Integer> score : factionScores.entrySet()){
                             playerFaction.getFactionEntry(score.getKey()).setFactionScore(score.getValue());
                         }

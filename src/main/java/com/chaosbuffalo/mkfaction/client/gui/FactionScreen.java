@@ -1,6 +1,6 @@
 package com.chaosbuffalo.mkfaction.client.gui;
 
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
@@ -85,7 +85,7 @@ public class FactionScreen extends MKScreen {
         if (getMinecraft().player == null){
             return root;
         }
-        getMinecraft().player.getCapability(Capabilities.PLAYER_FACTION_CAPABILITY).ifPresent(playerFaction -> {
+        getMinecraft().player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(playerFaction -> {
             List<MKFaction> factions = new ArrayList<>();
             for (ResourceLocation factionName : playerFaction.getFactionMap().keySet()){
                 MKFaction faction = MKFactionRegistry.getFaction(factionName);

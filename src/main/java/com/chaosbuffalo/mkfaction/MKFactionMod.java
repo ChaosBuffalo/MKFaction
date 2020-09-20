@@ -1,6 +1,6 @@
 package com.chaosbuffalo.mkfaction;
 
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.faction.FactionDefaultManager;
 import com.chaosbuffalo.mkfaction.faction.FactionManager;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
@@ -42,7 +42,7 @@ public class MKFactionMod
     private void setup(final FMLCommonSetupEvent event){
         PacketHandler.setupHandler();
         TargetingHooks.registerHooks();
-        Capabilities.registerCapabilities();
+        FactionCapabilities.registerCapabilities();
     }
 
     private void clientSetup(final FMLClientSetupEvent event){

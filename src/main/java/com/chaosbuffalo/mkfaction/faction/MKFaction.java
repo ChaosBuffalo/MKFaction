@@ -1,7 +1,7 @@
 package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
-import com.chaosbuffalo.mkfaction.capabilities.Capabilities;
+import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,6 +18,8 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
     private ResourceLocation name;
     private final Set<ResourceLocation> allies;
     private final Set<ResourceLocation> enemies;
+    private final Set<String> firstNames;
+    private final Set<String> lastNames;
     private int defaultPlayerScore;
 
     public MKFaction(ResourceLocation name, int defaultPlayerScore){
@@ -30,6 +32,8 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
         this.allies = allies;
         this.enemies = enemies;
         this.defaultPlayerScore = defaultPlayerScore;
+        this.firstNames = new HashSet<>();
+        this.lastNames = new HashSet<>();
     }
 
     public String getTranslationKey(){
@@ -38,7 +42,14 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
         } else {
             return "faction.mkfaction.invalid.name";
         }
+    }
 
+    public Set<String> getFirstNames() {
+        return firstNames;
+    }
+
+    public Set<String> getLastNames() {
+        return lastNames;
     }
 
     public int getDefaultPlayerScore(){
@@ -85,7 +96,7 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
         if (entity instanceof PlayerEntity){
             return false;
         } else {
-            return entity.getCapability(Capabilities.MOB_FACTION_CAPABILITY)
+            return entity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)
                     .map((cap) -> cap.getFactionName().equals(getRegistryName())).orElse(false);
         }
     }
@@ -106,6 +117,14 @@ public class MKFaction implements IForgeRegistryEntry<MKFaction> {
     public MKFaction setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
+    }
+
+    public void addFirstName(String name){
+        firstNames.add(name);
+    }
+
+    public void addLastName(String name){
+        lastNames.add(name);
     }
 
     @Nullable

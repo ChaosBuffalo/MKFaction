@@ -88,6 +88,20 @@ public class FactionManager extends JsonReloadListener {
             String enemyName = ele.getAsString();
             faction.addEnemy(new ResourceLocation(enemyName));
         }
+        if (json.has("firstNames")){
+            JsonArray firstNames = json.get("firstNames").getAsJsonArray();
+            for (JsonElement firstName : firstNames){
+                String firstNameStr = firstName.getAsString();
+                faction.addFirstName(firstNameStr);
+            }
+        }
+        if (json.has("lastNames")){
+            JsonArray lastNames = json.get("lastNames").getAsJsonArray();
+            for (JsonElement lastName : lastNames){
+                String lastNameStr = lastName.getAsString();
+                faction.addLastName(lastNameStr);
+            }
+        }
         MKFactionMod.LOGGER.info("Updated Faction: {} default score: {}", loc, faction.getDefaultPlayerScore());
         return true;
     }
