@@ -74,20 +74,27 @@ public class FactionManager extends JsonReloadListener {
             MKFactionMod.LOGGER.warn("Failed to parse faction data for : {}", loc);
             return false;
         }
-        int defaultPlayerScore = json.get("defaultPlayerScore").getAsInt();
-        faction.setDefaultPlayerScore(defaultPlayerScore);
-        JsonArray allies = json.get("allies").getAsJsonArray();
-        faction.clearAllies();
-        for (JsonElement ele : allies){
-            String allyName = ele.getAsString();
-            faction.addAlly(new ResourceLocation(allyName));
+        if (json.has("defaultPlayerScore")){
+            int defaultPlayerScore = json.get("defaultPlayerScore").getAsInt();
+            faction.setDefaultPlayerScore(defaultPlayerScore);
         }
-        JsonArray enemies = json.get("enemies").getAsJsonArray();
-        faction.clearEnemies();
-        for (JsonElement ele : enemies){
-            String enemyName = ele.getAsString();
-            faction.addEnemy(new ResourceLocation(enemyName));
+        if (json.has("allies")){
+            JsonArray allies = json.get("allies").getAsJsonArray();
+            faction.clearAllies();
+            for (JsonElement ele : allies){
+                String allyName = ele.getAsString();
+                faction.addAlly(new ResourceLocation(allyName));
+            }
         }
+        if (json.has("enemies")){
+            JsonArray enemies = json.get("enemies").getAsJsonArray();
+            faction.clearEnemies();
+            for (JsonElement ele : enemies){
+                String enemyName = ele.getAsString();
+                faction.addEnemy(new ResourceLocation(enemyName));
+            }
+        }
+
         if (json.has("firstNames")){
             JsonArray firstNames = json.get("firstNames").getAsJsonArray();
             for (JsonElement firstName : firstNames){
