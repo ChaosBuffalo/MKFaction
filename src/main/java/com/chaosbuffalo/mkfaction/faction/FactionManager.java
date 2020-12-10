@@ -12,6 +12,7 @@ import net.minecraft.resources.IResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -30,15 +31,14 @@ public class FactionManager extends JsonReloadListener {
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonObject> objectIn, IResourceManager resourceManagerIn,
-                         IProfiler profilerIn) {
+    protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
         MKFactionMod.LOGGER.info("In apply reload for FactionManager");
         boolean wasChanged = false;
-        for(Map.Entry<ResourceLocation, JsonObject> entry : objectIn.entrySet()) {
+        for(Map.Entry<ResourceLocation, JsonElement> entry : objectIn.entrySet()) {
             ResourceLocation resourcelocation = entry.getKey();
             MKFactionMod.LOGGER.info("Found file: {}", resourcelocation);
             if (resourcelocation.getPath().startsWith("_")) continue; //Forge: filter anything beginning with "_" as it's used for metadata.
-            if (parseFaction(entry.getKey(), entry.getValue())){
+            if (parseFaction(entry.getKey(), entry.getValue().getAsJsonObject())){
                 wasChanged = true;
             }
         }
@@ -51,6 +51,11 @@ public class FactionManager extends JsonReloadListener {
         MKFactionUpdatePacket updatePacket = new MKFactionUpdatePacket(MKFactionRegistry.FACTION_REGISTRY.getValues());
         server.getPlayerList().sendPacketToAllPlayers(PacketHandler.getNetworkChannel().toVanillaPacket(
                 updatePacket, NetworkDirection.PLAY_TO_CLIENT));
+    }
+
+    @SubscribeEvent
+    public void subscribeEvent(AddReloadListenerEvent event){
+        event.addListener(this);
     }
 
     @SuppressWarnings("unused")
@@ -112,4 +117,5 @@ public class FactionManager extends JsonReloadListener {
         MKFactionMod.LOGGER.info("Updated Faction: {} default score: {}", loc, faction.getDefaultPlayerScore());
         return true;
     }
+
 }
