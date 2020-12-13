@@ -16,19 +16,19 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 
 import java.util.Map;
 
 public class FactionManager extends JsonReloadListener {
-    private final MinecraftServer server;
+    private MinecraftServer server;
     private boolean serverStarted = false;
 
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
-    public FactionManager(MinecraftServer server) {
+    public FactionManager() {
         super(GSON, "factions");
-        this.server = server;
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -52,6 +52,13 @@ public class FactionManager extends JsonReloadListener {
     @SubscribeEvent
     public void serverStart(FMLServerAboutToStartEvent event) {
         serverStarted = true;
+        server = event.getServer();
+    }
+
+    @SubscribeEvent
+    public void serverStop(FMLServerStoppingEvent event) {
+        serverStarted = false;
+        server = null;
     }
 
 

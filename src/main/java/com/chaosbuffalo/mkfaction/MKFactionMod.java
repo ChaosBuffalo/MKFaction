@@ -33,6 +33,8 @@ public class MKFactionMod {
         // Register the enqueueIMC method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
         MinecraftForge.EVENT_BUS.register(this);
+        factionManager = new FactionManager();
+        factionDefaultManager = new FactionDefaultManager();
     }
 
 
@@ -47,13 +49,6 @@ public class MKFactionMod {
     private void clientSetup(final FMLClientSetupEvent event) {
         LOGGER.info("Client setup");
         InputHandler.registerKeybinds();
-    }
-
-    @SuppressWarnings("unused")
-    @SubscribeEvent
-    public void aboutToStart(FMLServerAboutToStartEvent event) {
-        factionManager = new FactionManager(event.getServer());
-        factionDefaultManager = new FactionDefaultManager();
     }
 
     @SubscribeEvent
