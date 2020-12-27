@@ -8,7 +8,7 @@ import com.chaosbuffalo.mkfaction.faction.PlayerFactionStatus;
 import com.chaosbuffalo.mkwidgets.MKWidgets;
 import com.chaosbuffalo.mkwidgets.client.gui.constraints.CenterXConstraint;
 import com.chaosbuffalo.mkwidgets.client.gui.constraints.MarginConstraint;
-import com.chaosbuffalo.mkwidgets.client.gui.constraints.VerticalStackConstraint;
+import com.chaosbuffalo.mkwidgets.client.gui.constraints.StackConstraint;
 import com.chaosbuffalo.mkwidgets.client.gui.layouts.MKLayout;
 import com.chaosbuffalo.mkwidgets.client.gui.layouts.MKStackLayoutVertical;
 import com.chaosbuffalo.mkwidgets.client.gui.screens.MKScreen;
@@ -45,7 +45,7 @@ public class FactionScreen extends MKScreen {
         root.setPaddingTop(10);
         MKText titleText = new MKText(font, title);
         root.addWidget(titleText);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.TOP), titleText);
+        root.addConstraintToWidget(MarginConstraint.TOP, titleText);
         root.addConstraintToWidget(new CenterXConstraint(), titleText);
         return root;
     }
@@ -57,8 +57,8 @@ public class FactionScreen extends MKScreen {
         MKText factionName = new MKText(this.font, nameText, 200, font.FONT_HEIGHT);
         factionName.setWidth(font.getStringWidth(nameText.getString()));
         root.addWidget(factionName);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.TOP), factionName);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.LEFT), factionName);
+        root.addConstraintToWidget(MarginConstraint.TOP, factionName);
+        root.addConstraintToWidget(MarginConstraint.LEFT, factionName);
         PlayerFactionStatus factionStatus = entry.getFactionStatus();
         ITextComponent valueText = new TranslationTextComponent(factionStatus.getTranslationKey())
                 .append(new StringTextComponent(String.format("(%d)", entry.getFactionScore())))
@@ -66,8 +66,8 @@ public class FactionScreen extends MKScreen {
         MKText factionValue = new MKText(this.font, valueText, 200, font.FONT_HEIGHT);
         factionValue.setWidth(font.getStringWidth(valueText.getString()));
         root.addWidget(factionValue);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.TOP), factionValue);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.RIGHT), factionValue);
+        root.addConstraintToWidget(MarginConstraint.TOP, factionValue);
+        root.addConstraintToWidget(MarginConstraint.RIGHT, factionValue);
         return root;
     }
 
@@ -77,7 +77,7 @@ public class FactionScreen extends MKScreen {
         MKScrollView scrollView = new MKScrollView(0, 0, PANEL_WIDTH, PANEL_HEIGHT, true);
         root.addWidget(scrollView);
         scrollView.setScrollVelocity(3.0);
-        root.addConstraintToWidget(new VerticalStackConstraint(), scrollView);
+        root.addConstraintToWidget(StackConstraint.VERTICAL, scrollView);
         root.addConstraintToWidget(new CenterXConstraint(), scrollView);
         MKStackLayoutVertical verticalLayout = new MKStackLayoutVertical(0, 0, PANEL_WIDTH);
         verticalLayout.doSetChildWidth(true).setPaddingBot(5).setMarginTop(5).setMarginRight(5)
