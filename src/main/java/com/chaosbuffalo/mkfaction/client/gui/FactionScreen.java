@@ -61,7 +61,7 @@ public class FactionScreen extends MKScreen {
         root.addConstraintToWidget(MarginConstraint.LEFT, factionName);
         PlayerFactionStatus factionStatus = entry.getFactionStatus();
         ITextComponent valueText = new TranslationTextComponent(factionStatus.getTranslationKey())
-                .append(new StringTextComponent(String.format("(%d)", entry.getFactionScore())))
+                .appendSibling(new StringTextComponent(String.format("(%d)", entry.getFactionScore())))
                 .mergeStyle(factionStatus.getColor());
         MKText factionValue = new MKText(this.font, valueText, 200, font.FONT_HEIGHT);
         factionValue.setWidth(font.getStringWidth(valueText.getString()));
