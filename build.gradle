@@ -85,7 +85,7 @@ minecraft {
             args '--mod', 'mkfaction', '--all', '--output', file('src/generated/resources/')
 
             mods {
-                examplemod {
+                mkfaction {
                     source sourceSets.main
                 }
             }
@@ -95,12 +95,12 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${forge_version}"
-    compileOnly fg.deobf("com.chaosbuffalo.targeting_api:TargetingAPI:0.21")
-    runtimeOnly fg.deobf("com.chaosbuffalo.targeting_api:TargetingAPI:0.21")
-    compileOnly fg.deobf("com.chaosbuffalo.mkwidgets:MKWidgets:1.14")
-    runtimeOnly fg.deobf("com.chaosbuffalo.mkwidgets:MKWidgets:1.14")
-    compileOnly fg.deobf("com.chaosbuffalo.mkcore:MKCore:0.11")
-    runtimeOnly fg.deobf("com.chaosbuffalo.mkcore:MKCore:0.11")
+    compileOnly fg.deobf("com.chaosbuffalo.targeting_api:targeting_api-${mc_version}:${targeting_api_version}")
+    runtimeOnly fg.deobf("com.chaosbuffalo.targeting_api:targeting_api-${mc_version}:${targeting_api_version}")
+    compileOnly fg.deobf("com.chaosbuffalo.mkwidgets:mkwidgets-${mc_version}:${mk_widgets_version}")
+    runtimeOnly fg.deobf("com.chaosbuffalo.mkwidgets:mkwidgets-${mc_version}:${mk_widgets_version}")
+    compileOnly fg.deobf("com.chaosbuffalo.mkcore:mkcore-${mc_version}:${mk_core_version}")
+    runtimeOnly fg.deobf("com.chaosbuffalo.mkcore:mkcore-${mc_version}:${mk_core_version}")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -127,6 +127,7 @@ jar.finalizedBy('reobfJar')
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId jar.baseName
             artifact jar
         }
     }

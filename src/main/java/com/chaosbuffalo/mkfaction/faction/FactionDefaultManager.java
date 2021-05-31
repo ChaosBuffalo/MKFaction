@@ -6,6 +6,9 @@ import com.google.gson.*;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.HashMap;
 
@@ -15,10 +18,16 @@ public class FactionDefaultManager extends SingleJsonFileReloadListener {
 
     public FactionDefaultManager(){
         super(GSON, MKFactionMod.MODID, "categories");
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public static ResourceLocation getFactionForEntity(ResourceLocation entity){
         return factionDefaults.getOrDefault(entity, MKFaction.INVALID_FACTION);
+    }
+
+    @SubscribeEvent
+    public void subscribeEvent(AddReloadListenerEvent event){
+        event.addListener(this);
     }
 
     @Override

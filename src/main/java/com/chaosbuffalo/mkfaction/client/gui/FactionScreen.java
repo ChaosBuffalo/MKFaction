@@ -8,13 +8,14 @@ import com.chaosbuffalo.mkfaction.faction.PlayerFactionStatus;
 import com.chaosbuffalo.mkwidgets.MKWidgets;
 import com.chaosbuffalo.mkwidgets.client.gui.constraints.CenterXConstraint;
 import com.chaosbuffalo.mkwidgets.client.gui.constraints.MarginConstraint;
-import com.chaosbuffalo.mkwidgets.client.gui.constraints.VerticalStackConstraint;
+import com.chaosbuffalo.mkwidgets.client.gui.constraints.StackConstraint;
 import com.chaosbuffalo.mkwidgets.client.gui.layouts.MKLayout;
 import com.chaosbuffalo.mkwidgets.client.gui.layouts.MKStackLayoutVertical;
 import com.chaosbuffalo.mkwidgets.client.gui.screens.MKScreen;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKAbstractGui;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKScrollView;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKText;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -44,7 +45,7 @@ public class FactionScreen extends MKScreen {
         root.setPaddingTop(10);
         MKText titleText = new MKText(font, title);
         root.addWidget(titleText);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.TOP), titleText);
+        root.addConstraintToWidget(MarginConstraint.TOP, titleText);
         root.addConstraintToWidget(new CenterXConstraint(), titleText);
         return root;
     }
@@ -54,19 +55,19 @@ public class FactionScreen extends MKScreen {
         root.setMarginBot(5).setMarginTop(5).setMarginLeft(5).setMarginRight(5);
         TranslationTextComponent nameText = new TranslationTextComponent(faction.getTranslationKey());
         MKText factionName = new MKText(this.font, nameText, 200, font.FONT_HEIGHT);
-        factionName.setWidth(font.getStringWidth(nameText.getFormattedText()));
+        factionName.setWidth(font.getStringWidth(nameText.getString()));
         root.addWidget(factionName);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.TOP), factionName);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.LEFT), factionName);
+        root.addConstraintToWidget(MarginConstraint.TOP, factionName);
+        root.addConstraintToWidget(MarginConstraint.LEFT, factionName);
         PlayerFactionStatus factionStatus = entry.getFactionStatus();
         ITextComponent valueText = new TranslationTextComponent(factionStatus.getTranslationKey())
-                .appendText(String.format("(%d)", entry.getFactionScore()))
-                .applyTextStyle(factionStatus.getColor());
+                .appendSibling(new StringTextComponent(String.format("(%d)", entry.getFactionScore())))
+                .mergeStyle(factionStatus.getColor());
         MKText factionValue = new MKText(this.font, valueText, 200, font.FONT_HEIGHT);
-        factionValue.setWidth(font.getStringWidth(valueText.getFormattedText()));
+        factionValue.setWidth(font.getStringWidth(valueText.getString()));
         root.addWidget(factionValue);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.TOP), factionValue);
-        root.addConstraintToWidget(new MarginConstraint(MarginConstraint.MarginType.RIGHT), factionValue);
+        root.addConstraintToWidget(MarginConstraint.TOP, factionValue);
+        root.addConstraintToWidget(MarginConstraint.RIGHT, factionValue);
         return root;
     }
 
@@ -76,7 +77,7 @@ public class FactionScreen extends MKScreen {
         MKScrollView scrollView = new MKScrollView(0, 0, PANEL_WIDTH, PANEL_HEIGHT, true);
         root.addWidget(scrollView);
         scrollView.setScrollVelocity(3.0);
-        root.addConstraintToWidget(new VerticalStackConstraint(), scrollView);
+        root.addConstraintToWidget(StackConstraint.VERTICAL, scrollView);
         root.addConstraintToWidget(new CenterXConstraint(), scrollView);
         MKStackLayoutVertical verticalLayout = new MKStackLayoutVertical(0, 0, PANEL_WIDTH);
         verticalLayout.doSetChildWidth(true).setPaddingBot(5).setMarginTop(5).setMarginRight(5)
@@ -119,14 +120,14 @@ public class FactionScreen extends MKScreen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         int xPos = width / 2 - PANEL_WIDTH / 2;
         int yPos = height / 2 - PANEL_HEIGHT / 2;
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         Minecraft.getInstance().getTextureManager().bindTexture(BG_LOC);
         RenderSystem.disableLighting();
-        MKAbstractGui.mkBlitUVSizeSame(xPos, yPos, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, 512, 512);
-        super.render(mouseX, mouseY, partialTicks);
+        MKAbstractGui.mkBlitUVSizeSame(matrixStack, xPos, yPos, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, 512, 512);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
         RenderSystem.enableLighting();
     }
 }

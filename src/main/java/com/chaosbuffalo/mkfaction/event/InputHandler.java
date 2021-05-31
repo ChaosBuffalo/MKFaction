@@ -10,8 +10,11 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -44,23 +47,23 @@ public class InputHandler {
     }
 
     public static <E extends Entity> EntityRayTraceResult rayTraceEntities(Class<E> clazz, World world,
-                                                                           Vec3d from, Vec3d to,
-                                                                           Vec3d aaExpansion,
+                                                                           Vector3d from, Vector3d to,
+                                                                           Vector3d aaExpansion,
                                                                            float aaGrowth,
                                                                            float entityExpansion,
                                                                            final Predicate<E> filter) {
         Entity nearest = null;
         double distance = 0;
-        Vec3d hitVec = null;
+        Vector3d hitVec = null;
         AxisAlignedBB bb = new AxisAlignedBB(new BlockPos(from), new BlockPos(to))
                 .expand(aaExpansion.x, aaExpansion.y, aaExpansion.z)
                 .grow(aaGrowth);
         List<E> entities = world.getEntitiesWithinAABB(clazz, bb, filter);
         for (Entity entity : entities) {
             AxisAlignedBB entityBB = entity.getBoundingBox().grow(entityExpansion);
-            Optional<Vec3d> intercept = entityBB.rayTrace(from, to);
+            Optional<Vector3d> intercept = entityBB.rayTrace(from, to);
             if (intercept.isPresent()) {
-                Vec3d vec = intercept.get();
+                Vector3d vec = intercept.get();
                 double dist = from.distanceTo(vec);
                 if (dist < distance || distance == 0.0D) {
                     nearest = entity;
@@ -85,10 +88,10 @@ public class InputHandler {
 
         EntityRayTraceResult position = null;
         if (mainEntity.world != null) {
-            Vec3d look = mainEntity.getLookVec().scale(distance);
-            Vec3d from = mainEntity.getPositionVector().add(0, mainEntity.getEyeHeight(), 0);
-            Vec3d to = from.add(look);
-            position = rayTraceEntities(clazz, mainEntity.world, from, to, Vec3d.ZERO, .5f,
+            Vector3d look = mainEntity.getLookVec().scale(distance);
+            Vector3d from = mainEntity.getPositionVec().add(0, mainEntity.getEyeHeight(), 0);
+            Vector3d to = from.add(look);
+            position = rayTraceEntities(clazz, mainEntity.world, from, to, Vector3d.ZERO, .5f,
                     .5f, finalFilter);
         }
         return position;
@@ -114,11 +117,12 @@ public class InputHandler {
                                     PlayerFactionStatus status = playerFaction.getFactionStatus(mobFaction.getFactionName());
                                     ITextComponent msg = new TranslationTextComponent(status.getTranslationKey() + ".con",
                                             result.getEntity().getName())
-                                            .applyTextStyle(status.getColor());
+                                            .mergeStyle(status.getColor());
                                     if (player.isCreative()) {
-                                        msg.appendText(String.format(" (%s)", mobFaction.getFactionName()));
+                                        msg.getSiblings().add(new StringTextComponent(
+                                                String.format(" (%s)", mobFaction.getFactionName())));
                                     }
-                                    player.sendMessage(msg);
+                                    player.sendMessage(msg, Util.DUMMY_UUID);
                                 }));
             }
         }
