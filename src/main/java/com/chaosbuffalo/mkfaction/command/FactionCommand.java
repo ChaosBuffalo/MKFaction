@@ -1,6 +1,6 @@
 package com.chaosbuffalo.mkfaction.command;
 
-import com.chaosbuffalo.mkcore.utils.TextUtils;
+import com.chaosbuffalo.mkcore.utils.ChatUtils;
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
@@ -71,7 +71,7 @@ public class FactionCommand {
             faction.getFactionEntry(factionId).ifPresent(entry -> {
                 entry.incrementFaction(amount);
                 String line = describeEntry(entry);
-                TextUtils.sendChatMessage(player, line);
+                ChatUtils.sendMessage(player, line);
             });
         });
 
@@ -87,7 +87,7 @@ public class FactionCommand {
             faction.getFactionEntry(factionId).ifPresent(entry -> {
                 entry.setFactionScore(amount);
                 String line = describeEntry(entry);
-                TextUtils.sendChatMessage(player, line);
+                ChatUtils.sendMessage(player, line);
             });
         });
 
@@ -101,7 +101,7 @@ public class FactionCommand {
         player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
             faction.getFactionEntry(factionId).ifPresent(entry -> {
                 String line = describeEntry(entry);
-                TextUtils.sendChatMessage(player, line);
+                ChatUtils.sendMessage(player, line);
             });
         });
 
@@ -115,7 +115,7 @@ public class FactionCommand {
         player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
             faction.getFactionMap().forEach((name, entry) -> {
                 String line = describeEntry(entry);
-                TextUtils.sendChatMessage(player, line);
+                ChatUtils.sendMessage(player, line);
             });
         });
 
