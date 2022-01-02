@@ -5,6 +5,8 @@ import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.network.MKFactionUpdatePacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import com.google.gson.*;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.profiler.IProfiler;
@@ -94,41 +96,7 @@ public class FactionManager extends JsonReloadListener {
             MKFactionMod.LOGGER.warn("Failed to parse faction data for : {}", loc);
             return false;
         }
-        if (json.has("defaultPlayerScore")){
-            int defaultPlayerScore = json.get("defaultPlayerScore").getAsInt();
-            faction.setDefaultPlayerScore(defaultPlayerScore);
-        }
-        if (json.has("allies")){
-            JsonArray allies = json.get("allies").getAsJsonArray();
-            faction.clearAllies();
-            for (JsonElement ele : allies){
-                String allyName = ele.getAsString();
-                faction.addAlly(new ResourceLocation(allyName));
-            }
-        }
-        if (json.has("enemies")){
-            JsonArray enemies = json.get("enemies").getAsJsonArray();
-            faction.clearEnemies();
-            for (JsonElement ele : enemies){
-                String enemyName = ele.getAsString();
-                faction.addEnemy(new ResourceLocation(enemyName));
-            }
-        }
-
-        if (json.has("firstNames")){
-            JsonArray firstNames = json.get("firstNames").getAsJsonArray();
-            for (JsonElement firstName : firstNames){
-                String firstNameStr = firstName.getAsString();
-                faction.addFirstName(firstNameStr);
-            }
-        }
-        if (json.has("lastNames")){
-            JsonArray lastNames = json.get("lastNames").getAsJsonArray();
-            for (JsonElement lastName : lastNames){
-                String lastNameStr = lastName.getAsString();
-                faction.addLastName(lastNameStr);
-            }
-        }
+        faction.deserialize(new Dynamic<>(JsonOps.INSTANCE, json));
         MKFactionMod.LOGGER.info("Updated Faction: {} default score: {}", loc, faction.getDefaultPlayerScore());
         return true;
     }

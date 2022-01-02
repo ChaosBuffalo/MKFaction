@@ -3,13 +3,15 @@ package com.chaosbuffalo.mkfaction.faction;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.targeting_api.Targeting;
+import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MKFaction extends ForgeRegistryEntry<MKFaction> {
     public static final ResourceLocation INVALID_FACTION = new ResourceLocation(MKFactionMod.MODID, "faction.invalid");
@@ -104,6 +106,51 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
             return entity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)
                     .map((cap) -> cap.getFactionName().equals(getRegistryName())).orElse(false);
         }
+    }
+
+    public <D> D serialize(DynamicOps<D> ops){
+        ImmutableMap.Builder<D, D> builder = ImmutableMap.builder();
+//        builder.put(ops.createString("name"),
+//                ops.createString(Objects.requireNonNull(getRegistryName()).toString()));
+        builder.put(ops.createString("defaultPlayerScore"),
+                ops.createInt(defaultPlayerScore));
+        builder.put(ops.createString("allies"), ops.createList(allies.stream().map(x -> ops.createString(x.toString()))));
+        builder.put(ops.createString("enemies"), ops.createList(enemies.stream().map(x -> ops.createString(x.toString()))));
+        builder.put(ops.createString("firstNames"), ops.createList(firstNames.stream().map(ops::createString)));
+        builder.put(ops.createString("lastNames"), ops.createList(lastNames.stream().map(ops::createString)));
+        return ops.createMap(builder.build());
+    }
+//
+//    public static <D> ResourceLocation getFactionName(Dynamic<D> d){
+//        return d.get("name").asString().result().map(ResourceLocation::new).orElse(INVALID_FACTION);
+//    }
+
+    public <D> void deserialize(Dynamic<D> dynamic){
+        defaultPlayerScore = dynamic.get("defaultPlayerScore").asInt(FactionConstants.TRUE_NEUTRAL);
+        List<ResourceLocation> allies = dynamic.get("allies").asList(x -> x.asString().result().map(ResourceLocation::new).orElse(INVALID_FACTION));
+        clearAllies();
+        for (ResourceLocation ally : allies){
+            if (!ally.equals(INVALID_FACTION))
+                addAlly(ally);
+        }
+        List<ResourceLocation> enemies = dynamic.get("enemies").asList(x -> x.asString().result().map(ResourceLocation::new).orElse(INVALID_FACTION));
+        clearEnemies();
+        for (ResourceLocation enemy : enemies){
+            if (!enemy.equals(INVALID_FACTION)){
+                addEnemy(enemy);
+            }
+        }
+        firstNames.clear();
+        List<Optional<String>> fNames = dynamic.get("firstNames").asList(x -> x.asString().result());
+        for (Optional<String> name : fNames){
+            name.ifPresent(this::addFirstName);
+        }
+        lastNames.clear();
+        List<Optional<String>> lNames = dynamic.get("lastNames").asList(x -> x.asString().result());
+        for (Optional<String> name : lNames){
+            name.ifPresent(this::addLastName);
+        }
+
     }
 
     public Targeting.TargetRelation getNonPlayerEntityRelationship(LivingEntity entity, ResourceLocation factionName){
