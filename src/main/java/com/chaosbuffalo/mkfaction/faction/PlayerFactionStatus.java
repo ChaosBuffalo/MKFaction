@@ -11,7 +11,7 @@ public enum PlayerFactionStatus {
     ENEMY(FactionConstants.ENEMY_THRESHOLD, "faction_status.enemy", TextFormatting.RED, Targeting.TargetRelation.ENEMY),
     SUSPECT(FactionConstants.WARY_THRESHOLD, "faction_status.suspect", TextFormatting.DARK_GRAY, Targeting.TargetRelation.NEUTRAL),
     UNKNOWN(FactionConstants.TRUE_NEUTRAL, "faction_status.unknown", TextFormatting.GRAY, Targeting.TargetRelation.NEUTRAL),
-    FRIEND(FactionConstants.FRIENDLY_THRESHOLD, "faction_status.friend", TextFormatting.AQUA, Targeting.TargetRelation.NEUTRAL),
+    FRIEND(FactionConstants.FRIENDLY_THRESHOLD, "faction_status.friend", TextFormatting.AQUA, Targeting.TargetRelation.FRIEND),
     ALLY(FactionConstants.ALLY_THRESHOLD, "faction_status.ally", TextFormatting.GREEN, Targeting.TargetRelation.FRIEND),
     HERO(FactionConstants.HERO_THRESHOLD, "faction_status.hero", TextFormatting.GOLD, Targeting.TargetRelation.FRIEND);
 
