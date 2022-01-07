@@ -1,9 +1,10 @@
 package com.chaosbuffalo.mkfaction.event;
 
+import com.chaosbuffalo.mkcore.MKCore;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
-import com.chaosbuffalo.mkfaction.client.gui.FactionScreen;
+import com.chaosbuffalo.mkfaction.client.gui.FactionPage;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -104,11 +105,11 @@ public class InputHandler {
     }
 
     private static void handleInputEvent() {
+        PlayerEntity player = Minecraft.getInstance().player;
+        if (player == null) {
+            return;
+        }
         while (CON_KEY_BIND.isPressed()) {
-            PlayerEntity player = Minecraft.getInstance().player;
-            if (player == null) {
-                return;
-            }
             EntityRayTraceResult result = getLookingAtNonPlayer(LivingEntity.class, player, 30.0f);
             if (result != null) {
                 result.getEntity().getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY).ifPresent(
@@ -127,7 +128,7 @@ public class InputHandler {
             }
         }
         while (FACTION_PANEL_KEY_BIND.isPressed()) {
-            Minecraft.getInstance().displayGuiScreen(new FactionScreen());
+            MKCore.getPlayer(player).ifPresent(playerData -> Minecraft.getInstance().displayGuiScreen(new FactionPage(playerData)));
         }
     }
 

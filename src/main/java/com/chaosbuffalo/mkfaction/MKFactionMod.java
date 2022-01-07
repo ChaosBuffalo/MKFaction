@@ -2,14 +2,17 @@ package com.chaosbuffalo.mkfaction;
 
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.capabilities.PlayerFactionHandler;
+import com.chaosbuffalo.mkfaction.client.gui.FactionPage;
 import com.chaosbuffalo.mkfaction.command.FactionCommand;
 import com.chaosbuffalo.mkfaction.event.InputHandler;
 import com.chaosbuffalo.mkfaction.faction.FactionDefaultManager;
 import com.chaosbuffalo.mkfaction.faction.FactionManager;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -57,5 +60,6 @@ public class MKFactionMod {
 
     private void enqueueIMC(final InterModEnqueueEvent event) {
         PlayerFactionHandler.registerPersonaExtension();
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> FactionPage::registerPlayerPage);
     }
 }
