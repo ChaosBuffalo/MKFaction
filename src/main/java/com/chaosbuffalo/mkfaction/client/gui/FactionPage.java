@@ -13,6 +13,7 @@ import com.chaosbuffalo.mkwidgets.client.gui.constraints.MarginConstraint;
 import com.chaosbuffalo.mkwidgets.client.gui.layouts.MKLayout;
 import com.chaosbuffalo.mkwidgets.client.gui.layouts.MKStackLayoutVertical;
 import com.chaosbuffalo.mkwidgets.client.gui.screens.MKScreen;
+import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKScrollView;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKText;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKWidget;
 import net.minecraft.client.resources.I18n;
@@ -28,6 +29,8 @@ import java.util.List;
 
 public class FactionPage extends PlayerPageBase {
 
+    protected MKScrollView scrollView;
+
     public FactionPage(MKPlayerData playerData) {
         super(playerData, new StringTextComponent("Factions"));
     }
@@ -40,7 +43,13 @@ public class FactionPage extends PlayerPageBase {
     @Override
     public void setupScreen() {
         super.setupScreen();
-        addWidget(createScrollingPanelWithContent(this::createFactionEntryList, this::setupFactionHeader));
+        addWidget(createScrollingPanelWithContent(this::createFactionEntryList, this::setupFactionHeader, v -> scrollView = v));
+    }
+
+    @Override
+    protected void persistState(boolean wasResized) {
+        super.persistState(wasResized);
+        persistScrollView(() -> scrollView, wasResized);
     }
 
     public MKLayout getFactionEntryLayout(PlayerFactionEntry entry, MKFaction faction, int width) {
