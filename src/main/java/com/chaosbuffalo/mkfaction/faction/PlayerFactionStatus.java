@@ -31,6 +31,12 @@ public enum PlayerFactionStatus {
         this.relation = relation;
     }
 
+    public boolean isOpposite(PlayerFactionStatus other){
+        if (getRelation() == Targeting.TargetRelation.ENEMY && other.getRelation() == Targeting.TargetRelation.FRIEND){
+            return true;
+        } else return getRelation() == Targeting.TargetRelation.FRIEND && other.getRelation() == Targeting.TargetRelation.ENEMY;
+    }
+
     public int getThreshold() {
         return threshold;
     }

@@ -2,6 +2,8 @@ package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
+import com.chaosbuffalo.mkfaction.capabilities.IMobFaction;
+import com.chaosbuffalo.mkfaction.capabilities.MobFactionHandler;
 import com.chaosbuffalo.targeting_api.Targeting;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Dynamic;
@@ -153,7 +155,7 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
 
     }
 
-    public Targeting.TargetRelation getNonPlayerEntityRelationship(LivingEntity entity, ResourceLocation factionName){
+    public Targeting.TargetRelation getNonPlayerEntityRelationship(LivingEntity entity, ResourceLocation factionName, MKFaction otherFaction){
         if (isMember(entity)){
             return Targeting.TargetRelation.FRIEND;
         } else if (isEnemy(factionName)){
@@ -161,6 +163,11 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         } else if (isAlly(factionName)){
             return Targeting.TargetRelation.FRIEND;
         } else {
+            PlayerFactionStatus thisPlayerFaction = PlayerFactionStatus.forScore(getDefaultPlayerScore());
+            PlayerFactionStatus otherPlayerFaction = PlayerFactionStatus.forScore(otherFaction.getDefaultPlayerScore());
+            if (thisPlayerFaction.isOpposite(otherPlayerFaction)){
+                return Targeting.TargetRelation.ENEMY;
+            }
             return Targeting.TargetRelation.NEUTRAL;
         }
     }
