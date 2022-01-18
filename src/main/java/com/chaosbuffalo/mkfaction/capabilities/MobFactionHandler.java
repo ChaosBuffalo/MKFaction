@@ -25,6 +25,7 @@ public class MobFactionHandler implements IMobFaction {
     }
 
     @Nullable
+    @Override
     public MKFaction getFaction() {
         return faction;
     }
@@ -77,7 +78,7 @@ public class MobFactionHandler implements IMobFaction {
                     .orElse(Targeting.TargetRelation.UNHANDLED);
         }
         return otherEntity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)
-                .map(mobFaction -> faction.getNonPlayerEntityRelationship(otherEntity, mobFaction.getFactionName()))
+                .map(mobFaction -> faction.getNonPlayerEntityRelationship(otherEntity, mobFaction.getFactionName(), mobFaction.getFaction()))
                 .orElse(Targeting.TargetRelation.UNHANDLED);
     }
 
