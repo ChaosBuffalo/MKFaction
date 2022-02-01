@@ -163,6 +163,9 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         } else if (isAlly(factionName)){
             return Targeting.TargetRelation.FRIEND;
         } else {
+            if (otherFaction == null){
+                return Targeting.TargetRelation.NEUTRAL;
+            }
             PlayerFactionStatus thisPlayerFaction = PlayerFactionStatus.forScore(getDefaultPlayerScore());
             PlayerFactionStatus otherPlayerFaction = PlayerFactionStatus.forScore(otherFaction.getDefaultPlayerScore());
             if (thisPlayerFaction.isOpposite(otherPlayerFaction)){
