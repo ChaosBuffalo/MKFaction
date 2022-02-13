@@ -24,13 +24,14 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import java.util.Map;
 
 public class FactionManager extends JsonReloadListener {
+    public static final String DEFINITION_FOLDER = "factions";
     private MinecraftServer server;
     private boolean serverStarted = false;
 
-    private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public FactionManager() {
-        super(GSON, "factions");
+        super(GSON, DEFINITION_FOLDER);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
