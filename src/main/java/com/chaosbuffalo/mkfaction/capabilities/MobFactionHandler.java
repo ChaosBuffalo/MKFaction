@@ -9,19 +9,20 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 
 public class MobFactionHandler implements IMobFaction {
+    private final LivingEntity entity;
     private ResourceLocation factionName;
     private MKFaction faction;
-    private LivingEntity entity;
 
-    public MobFactionHandler() {
+    public MobFactionHandler(LivingEntity entity) {
+        this.entity = entity;
         factionName = MKFaction.INVALID_FACTION;
-        entity = null;
     }
 
     @Nullable
@@ -30,7 +31,6 @@ public class MobFactionHandler implements IMobFaction {
         return faction;
     }
 
-
     @Override
     public ResourceLocation getFactionName() {
         return factionName;
@@ -38,9 +38,7 @@ public class MobFactionHandler implements IMobFaction {
 
     private void setFactionNameInternal(ResourceLocation factionName) {
         this.factionName = factionName;
-        if (!factionName.equals(MKFaction.INVALID_FACTION)) {
-            this.faction = MKFactionRegistry.getFaction(factionName);
-        }
+        this.faction = MKFactionRegistry.getFaction(factionName);
     }
 
     public void setFactionName(ResourceLocation factionName) {
@@ -54,10 +52,6 @@ public class MobFactionHandler implements IMobFaction {
         MobFactionUpdatePacket updatePacket = new MobFactionUpdatePacket(this);
         PacketDistributor.TRACKING_ENTITY.with(this::getEntity)
                 .send(PacketHandler.getNetworkChannel().toVanillaPacket(updatePacket, NetworkDirection.PLAY_TO_CLIENT));
-    }
-
-    public void attach(LivingEntity entity) {
-        this.entity = entity;
     }
 
     @Override
@@ -95,6 +89,23 @@ public class MobFactionHandler implements IMobFaction {
             setFactionNameInternal(new ResourceLocation(nbt.getString("factionName")));
         } else {
             setFactionNameInternal(MKFaction.INVALID_FACTION);
+        }
+    }
+
+    public static class Provider extends FactionCapabilities.Provider<LivingEntity, IMobFaction> {
+
+        public Provider(LivingEntity entity) {
+            super(entity);
+        }
+
+        @Override
+        IMobFaction makeData(LivingEntity attached) {
+            return new MobFactionHandler(attached);
+        }
+
+        @Override
+        Capability<IMobFaction> getCapability() {
+            return FactionCapabilities.MOB_FACTION_CAPABILITY;
         }
     }
 }

@@ -12,6 +12,7 @@ import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.InterModComms;
 
 import javax.annotation.Nullable;
@@ -21,13 +22,10 @@ import java.util.Optional;
 
 public class PlayerFactionHandler implements IPlayerFaction {
 
-    private PlayerEntity player;
+    private final PlayerEntity player;
     private MKPlayerData playerData;
 
-    public PlayerFactionHandler() {
-    }
-
-    public void attach(PlayerEntity player) {
+    public PlayerFactionHandler(PlayerEntity player) {
         // Do not attempt to access any persona-specific data here because at this time
         // it's impossible to get a copy of MKPlayerData
         this.player = player;
@@ -61,9 +59,8 @@ public class PlayerFactionHandler implements IPlayerFaction {
     @Override
     public CompoundNBT serializeNBT() {
         // This would be where global data that is shared across personas would be persisted.
-        // Currently there is none.
-        CompoundNBT tag = new CompoundNBT();
-        return tag;
+        // Currently, there is none.
+        return new CompoundNBT();
     }
 
     @Override
@@ -161,5 +158,22 @@ public class PlayerFactionHandler implements IPlayerFaction {
             MKFactionMod.LOGGER.info("Faction register persona by IMC");
             return factory;
         });
+    }
+
+    public static class Provider extends FactionCapabilities.Provider<PlayerEntity, IPlayerFaction> {
+
+        public Provider(PlayerEntity entity) {
+            super(entity);
+        }
+
+        @Override
+        IPlayerFaction makeData(PlayerEntity attached) {
+            return new PlayerFactionHandler(attached);
+        }
+
+        @Override
+        Capability<IPlayerFaction> getCapability() {
+            return FactionCapabilities.PLAYER_FACTION_CAPABILITY;
+        }
     }
 }
