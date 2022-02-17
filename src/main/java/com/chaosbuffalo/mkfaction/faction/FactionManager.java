@@ -34,7 +34,8 @@ public class FactionManager extends JsonReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> objectIn,
-                         @Nonnull IResourceManager resourceManagerIn, @Nonnull IProfiler profilerIn) {
+                         @Nonnull IResourceManager resourceManagerIn,
+                         @Nonnull IProfiler profilerIn) {
         MKFactionMod.LOGGER.info("In apply reload for FactionManager");
         for (Map.Entry<ResourceLocation, JsonElement> entry : objectIn.entrySet()) {
             ResourceLocation factionId = entry.getKey();

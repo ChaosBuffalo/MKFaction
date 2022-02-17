@@ -114,8 +114,7 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         ImmutableMap.Builder<D, D> builder = ImmutableMap.builder();
 //        builder.put(ops.createString("name"),
 //                ops.createString(Objects.requireNonNull(getRegistryName()).toString()));
-        builder.put(ops.createString("defaultPlayerScore"),
-                ops.createInt(defaultPlayerScore));
+        builder.put(ops.createString("defaultPlayerScore"), ops.createInt(defaultPlayerScore));
         builder.put(ops.createString("allies"), ops.createList(allies.stream().map(x -> ops.createString(x.toString()))));
         builder.put(ops.createString("enemies"), ops.createList(enemies.stream().map(x -> ops.createString(x.toString()))));
         builder.put(ops.createString("firstNames"), ops.createList(firstNames.stream().map(ops::createString)));
