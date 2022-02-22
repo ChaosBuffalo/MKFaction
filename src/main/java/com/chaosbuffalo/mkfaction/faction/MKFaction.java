@@ -10,9 +10,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -23,6 +25,7 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
     private final Set<ResourceLocation> enemies;
     private final Set<String> firstNames;
     private final Set<String> lastNames;
+    private final EnumMap<PlayerFactionStatus, String> customStatusNames = new EnumMap<>(PlayerFactionStatus.class);
     private int defaultPlayerScore;
 
     public MKFaction(ResourceLocation name, int defaultPlayerScore) {
@@ -49,6 +52,14 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
 
     public IFormattableTextComponent getDisplayName() {
         return new TranslationTextComponent(getTranslationKey());
+    }
+
+    public IFormattableTextComponent getStatusName(PlayerFactionStatus status) {
+        String customName = customStatusNames.get(status);
+        if (customName != null) {
+            return new StringTextComponent(customName);
+        }
+        return status.getDefaultDisplayName();
     }
 
     public Set<String> getFirstNames() {
@@ -91,6 +102,10 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         enemies.add(enemyName);
     }
 
+    public void setStatusName(PlayerFactionStatus status, String name) {
+        customStatusNames.put(status, name);
+    }
+
     public boolean isEnemy(ResourceLocation faction) {
         return enemies.contains(faction);
     }
@@ -116,6 +131,11 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         builder.put(ops.createString("enemies"), ops.createList(enemies.stream().map(x -> ops.createString(x.toString()))));
         builder.put(ops.createString("firstNames"), ops.createList(firstNames.stream().map(ops::createString)));
         builder.put(ops.createString("lastNames"), ops.createList(lastNames.stream().map(ops::createString)));
+        if (customStatusNames.size() > 0) {
+            ImmutableMap.Builder<D, D> nameBuilder = ImmutableMap.builder();
+            customStatusNames.forEach((status, name) -> nameBuilder.put(ops.createString(status.name()), ops.createString(name)));
+            builder.put(ops.createString("statusNames"), ops.createMap(nameBuilder.build()));
+        }
         return ops.createMap(builder.build());
     }
 
@@ -133,6 +153,16 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
 
         lastNames.clear();
         deserializeNameList(dynamic, "lastNames", lastNames::add);
+
+        customStatusNames.clear();
+        dynamic.get("statusNames").asMap(this::getStringOrThrow, this::getStringOrThrow).forEach((keyString, value) -> {
+            PlayerFactionStatus status = PlayerFactionStatus.valueOf(keyString);
+            customStatusNames.put(status, value);
+        });
+    }
+
+    private <D> String getStringOrThrow(Dynamic<D> dynamic) {
+        return dynamic.asString().getOrThrow(false, MKFactionMod.LOGGER::error);
     }
 
     private <D> void deserializeNameList(Dynamic<D> dynamic, String listName, Consumer<String> consumer) {

@@ -5,7 +5,6 @@ import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.function.Consumer;
 
@@ -62,8 +61,7 @@ public class PlayerFactionEntry implements IMKSerializable<CompoundNBT> {
     }
 
     public IFormattableTextComponent getStatusDisplayName() {
-        // TODO: add support for per-faction custom standing names here
-        return factionStatus.getDefaultDisplayName();
+        return faction.getStatusName(factionStatus);
     }
 
     @Override
