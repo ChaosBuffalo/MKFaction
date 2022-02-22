@@ -2,7 +2,7 @@ package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
-import com.chaosbuffalo.mkfaction.network.MKFactionUpdatePacket;
+import com.chaosbuffalo.mkfaction.network.MKFactionDefinitionUpdatePacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,26 +36,26 @@ public class FactionManager extends JsonReloadListener {
     protected void apply(Map<ResourceLocation, JsonElement> objectIn,
                          @Nonnull IResourceManager resourceManagerIn,
                          @Nonnull IProfiler profilerIn) {
-        MKFactionMod.LOGGER.info("In apply reload for FactionManager");
+        MKFactionMod.LOGGER.debug("FactionManager reloading all files");
         for (Map.Entry<ResourceLocation, JsonElement> entry : objectIn.entrySet()) {
             ResourceLocation factionId = entry.getKey();
             if (factionId.getPath().startsWith("_"))
                 continue; //Forge: filter anything beginning with "_" as it's used for metadata.
 
-            MKFactionMod.LOGGER.info("Found file: {}", factionId);
+            MKFactionMod.LOGGER.debug("Found file: {}", factionId);
             parseFaction(factionId, entry.getValue().getAsJsonObject());
         }
     }
 
     @SubscribeEvent
-    public void subscribeEvent(AddReloadListenerEvent event) {
+    public void addReloadListener(AddReloadListenerEvent event) {
         event.addListener(this);
     }
 
     @SubscribeEvent
     public void onDataPackSync(OnDatapackSyncEvent event) {
         MKFactionMod.LOGGER.debug("FactionManager.onDataPackSync");
-        MKFactionUpdatePacket updatePacket = new MKFactionUpdatePacket(MKFactionRegistry.FACTION_REGISTRY.getValues());
+        MKFactionDefinitionUpdatePacket updatePacket = new MKFactionDefinitionUpdatePacket(MKFactionRegistry.FACTION_REGISTRY.getValues());
         if (event.getPlayer() != null) {
             // sync to single player
             MKFactionMod.LOGGER.debug("Sending {} faction definition update packet", event.getPlayer());
@@ -68,15 +68,14 @@ public class FactionManager extends JsonReloadListener {
         }
     }
 
-    private boolean parseFaction(ResourceLocation factionId, JsonObject json) {
-        MKFactionMod.LOGGER.info("Parsing Faction Json for {}", factionId);
+    private void parseFaction(ResourceLocation factionId, JsonObject json) {
+        MKFactionMod.LOGGER.debug("Parsing Faction Json for {}", factionId);
         MKFaction faction = MKFactionRegistry.getFaction(factionId);
         if (faction == null) {
             MKFactionMod.LOGGER.warn("Failed to parse faction data for : {}", factionId);
-            return false;
+            return;
         }
         faction.deserialize(new Dynamic<>(JsonOps.INSTANCE, json));
         MKFactionMod.LOGGER.info("Updated Faction: {} default score: {}", factionId, faction.getDefaultPlayerScore());
-        return true;
     }
 }

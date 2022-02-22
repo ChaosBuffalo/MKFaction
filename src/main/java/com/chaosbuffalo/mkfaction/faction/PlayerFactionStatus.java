@@ -1,7 +1,9 @@
 package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.targeting_api.Targeting;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -19,10 +21,10 @@ public enum PlayerFactionStatus {
             .sorted(Comparator.comparingInt(PlayerFactionStatus::getThreshold))
             .toArray(PlayerFactionStatus[]::new);
 
-    final int threshold;
-    final String translationKey;
-    final TextFormatting color;
-    final Targeting.TargetRelation relation;
+    private final int threshold;
+    private final String translationKey;
+    private final TextFormatting color;
+    private final Targeting.TargetRelation relation;
 
     PlayerFactionStatus(int value, String translationKey, TextFormatting color, Targeting.TargetRelation relation) {
         this.threshold = value;
@@ -31,10 +33,12 @@ public enum PlayerFactionStatus {
         this.relation = relation;
     }
 
-    public boolean isOpposite(PlayerFactionStatus other){
-        if (getRelation() == Targeting.TargetRelation.ENEMY && other.getRelation() == Targeting.TargetRelation.FRIEND){
+    public boolean isOpposite(PlayerFactionStatus other) {
+        if (getRelation() == Targeting.TargetRelation.ENEMY && other.getRelation() == Targeting.TargetRelation.FRIEND) {
             return true;
-        } else return getRelation() == Targeting.TargetRelation.FRIEND && other.getRelation() == Targeting.TargetRelation.ENEMY;
+        } else {
+            return getRelation() == Targeting.TargetRelation.FRIEND && other.getRelation() == Targeting.TargetRelation.ENEMY;
+        }
     }
 
     public int getThreshold() {
@@ -43,6 +47,10 @@ public enum PlayerFactionStatus {
 
     public String getTranslationKey() {
         return translationKey;
+    }
+
+    public IFormattableTextComponent getDefaultDisplayName() {
+        return new TranslationTextComponent(getTranslationKey());
     }
 
     public TextFormatting getColor() {

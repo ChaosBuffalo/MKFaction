@@ -22,13 +22,13 @@ public class PacketHandler {
     }
 
     public static void registerMessages(SimpleChannel channel) {
-        channel.registerMessage(1, MKFactionUpdatePacket.class,
-                MKFactionUpdatePacket::toBytes,
-                MKFactionUpdatePacket::new,
-                MKFactionUpdatePacket::handle);
-        channel.registerMessage(2, MobFactionUpdatePacket.class,
-                MobFactionUpdatePacket::toBytes,
-                MobFactionUpdatePacket::new,
-                MobFactionUpdatePacket::handle);
+        channel.registerMessage(1, MKFactionDefinitionUpdatePacket.class,
+                MKFactionDefinitionUpdatePacket::toBytes,
+                MKFactionDefinitionUpdatePacket::new,
+                MKFactionDefinitionUpdatePacket::handle);
+        channel.registerMessage(2, MobFactionAssignmentPacket.class,
+                MobFactionAssignmentPacket::toBytes,
+                MobFactionAssignmentPacket::new,
+                MobFactionAssignmentPacket::handle);
     }
 }

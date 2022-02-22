@@ -2,7 +2,7 @@ package com.chaosbuffalo.mkfaction.capabilities;
 
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
-import com.chaosbuffalo.mkfaction.network.MobFactionUpdatePacket;
+import com.chaosbuffalo.mkfaction.network.MobFactionAssignmentPacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
@@ -23,6 +23,12 @@ public class MobFactionHandler implements IMobFaction {
     public MobFactionHandler(LivingEntity entity) {
         this.entity = entity;
         factionName = MKFaction.INVALID_FACTION;
+        faction = null;
+    }
+
+    @Override
+    public boolean hasFaction() {
+        return faction != null;
     }
 
     @Nullable
@@ -39,6 +45,9 @@ public class MobFactionHandler implements IMobFaction {
     private void setFactionNameInternal(ResourceLocation factionName) {
         this.factionName = factionName;
         this.faction = MKFactionRegistry.getFaction(factionName);
+        if (!factionName.equals(MKFaction.INVALID_FACTION) && faction == null) {
+            throw new IllegalStateException(String.format("Entity %s was switched to unregistered faction '%s'", entity, factionName));
+        }
     }
 
     public void setFactionName(ResourceLocation factionName) {
@@ -49,7 +58,7 @@ public class MobFactionHandler implements IMobFaction {
     }
 
     public void syncToAllTracking() {
-        MobFactionUpdatePacket updatePacket = new MobFactionUpdatePacket(this);
+        MobFactionAssignmentPacket updatePacket = new MobFactionAssignmentPacket(this);
         PacketDistributor.TRACKING_ENTITY.with(this::getEntity)
                 .send(PacketHandler.getNetworkChannel().toVanillaPacket(updatePacket, NetworkDirection.PLAY_TO_CLIENT));
     }

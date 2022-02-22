@@ -5,10 +5,8 @@ import com.chaosbuffalo.mkcore.client.gui.PlayerPageRegistry;
 import com.chaosbuffalo.mkcore.core.MKPlayerData;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
-import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
-import com.chaosbuffalo.mkfaction.faction.PlayerFactionStatus;
 import com.chaosbuffalo.mkwidgets.client.gui.constraints.MarginConstraint;
 import com.chaosbuffalo.mkwidgets.client.gui.layouts.MKLayout;
 import com.chaosbuffalo.mkwidgets.client.gui.layouts.MKStackLayoutVertical;
@@ -16,14 +14,12 @@ import com.chaosbuffalo.mkwidgets.client.gui.screens.MKScreen;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKScrollView;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKText;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKWidget;
-import net.minecraft.client.resources.I18n;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.InterModComms;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -52,22 +48,22 @@ public class FactionPage extends PlayerPageBase {
         persistScrollView(() -> scrollView, wasResized);
     }
 
-    public MKLayout getFactionEntryLayout(PlayerFactionEntry entry, MKFaction faction, int width) {
+    public MKLayout getFactionEntryLayout(PlayerFactionEntry entry, int width) {
+        MKFaction faction = entry.getFaction();
         MKLayout entryLayout = new MKLayout(0, 0, width, font.FONT_HEIGHT + 10);
         entryLayout.setMargins(5, 5, 5, 5);
 
-        TranslationTextComponent nameText = new TranslationTextComponent(faction.getTranslationKey());
+        ITextComponent nameText = faction.getDisplayName();
         MKText factionName = new MKText(font, nameText);
         factionName.setColor(0xffffffff);
-        factionName.setWidth(font.getStringWidth(nameText.getString()));
+        factionName.setWidth(font.getStringPropertyWidth(nameText));
         entryLayout.addWidget(factionName, MarginConstraint.TOP, MarginConstraint.LEFT);
 
-        PlayerFactionStatus factionStatus = entry.getFactionStatus();
-        ITextComponent valueText = new TranslationTextComponent(factionStatus.getTranslationKey())
-                .appendSibling(new StringTextComponent(String.format("(%d)", entry.getFactionScore())))
-                .mergeStyle(factionStatus.getColor());
+        ITextComponent valueText = entry.getStatusDisplayName()
+                .appendString(String.format(" (%d)", entry.getFactionScore()))
+                .mergeStyle(entry.getFactionStatus().getColor());
         MKText factionValue = new MKText(font, valueText);
-        factionValue.setWidth(font.getStringWidth(valueText.getString()));
+        factionValue.setWidth(font.getStringPropertyWidth(valueText));
         entryLayout.addWidget(factionValue, MarginConstraint.TOP, MarginConstraint.RIGHT);
         return entryLayout;
     }
@@ -79,21 +75,11 @@ public class FactionPage extends PlayerPageBase {
         stackLayout.doSetChildWidth(true);
 
         pData.getEntity().getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(playerFaction -> {
-            List<MKFaction> factions = new ArrayList<>();
-            for (ResourceLocation factionName : playerFaction.getFactionMap().keySet()) {
-                MKFaction faction = MKFactionRegistry.getFaction(factionName);
-                if (faction != null) {
-                    factions.add(faction);
-                }
-            }
-
-            factions.sort(Comparator.comparing(mkFaction -> I18n.format(mkFaction.getTranslationKey())));
-            for (MKFaction faction : factions) {
-                playerFaction.getFactionEntry(faction.getRegistryName()).ifPresent(entry -> {
-                    MKLayout factionLayout = getFactionEntryLayout(entry, faction, panelWidth - 10);
-                    stackLayout.addWidget(factionLayout);
-                });
-            }
+            List<PlayerFactionEntry> factions = ImmutableList.copyOf(playerFaction.getFactionMap().values());
+            factions.stream()
+                    .sorted(Comparator.comparing(entry -> entry.getFaction().getDisplayName().getString()))
+                    .map(entry -> getFactionEntryLayout(entry, panelWidth - 10))
+                    .forEach(stackLayout::addWidget);
         });
         return stackLayout;
     }
@@ -123,7 +109,7 @@ public class FactionPage extends PlayerPageBase {
     public static void registerPlayerPage() {
         PlayerPageRegistry.ExtensionProvider provider = PageFactory::new;
         InterModComms.sendTo("mkcore", "register_player_page", () -> {
-            MKFactionMod.LOGGER.info("Faction register player page");
+            MKFactionMod.LOGGER.debug("Faction register player page");
             return provider;
         });
     }

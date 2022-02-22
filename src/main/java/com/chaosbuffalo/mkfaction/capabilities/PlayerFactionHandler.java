@@ -7,6 +7,7 @@ import com.chaosbuffalo.mkcore.core.persona.IPersonaExtensionProvider;
 import com.chaosbuffalo.mkcore.core.persona.Persona;
 import com.chaosbuffalo.mkcore.sync.SyncMapUpdater;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
+import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
 import net.minecraft.entity.player.PlayerEntity;
@@ -85,13 +86,15 @@ public class PlayerFactionHandler implements IPlayerFaction {
             persona.getKnowledge().addSyncPrivate(factionUpdater);
         }
 
-        private PlayerFactionEntry createNewEntry(ResourceLocation name) {
-            if (name.equals(MKFaction.INVALID_FACTION)) {
+        private PlayerFactionEntry createNewEntry(ResourceLocation factionId) {
+            if (factionId.equals(MKFaction.INVALID_FACTION)) {
                 return null;
             }
-            PlayerFactionEntry entry = new PlayerFactionEntry(name);
-            entry.setDirtyNotifier(this::onDirtyEntry);
-            return entry;
+            MKFaction faction = MKFactionRegistry.getFaction(factionId);
+            if (faction == null) {
+                return null;
+            }
+            return new PlayerFactionEntry(faction, this::onDirtyEntry);
         }
 
         public Map<ResourceLocation, PlayerFactionEntry> getFactionMap() {
@@ -107,7 +110,7 @@ public class PlayerFactionHandler implements IPlayerFaction {
                 PlayerFactionEntry newEntry = createNewEntry(name);
                 if (newEntry == null)
                     return null;
-                newEntry.setToDefaultFactionScore();
+                newEntry.reset();
                 return newEntry;
             });
         }
@@ -147,7 +150,7 @@ public class PlayerFactionHandler implements IPlayerFaction {
     }
 
     private static PersonaFactionData createNewPersonaData(Persona persona) {
-        MKFactionMod.LOGGER.info("MKFaction creating new persona data for {}", persona.getPlayerData().getEntity());
+        MKFactionMod.LOGGER.debug("MKFaction creating new persona data for {}", persona.getPlayerData().getEntity());
         return new PersonaFactionData(persona);
     }
 
@@ -155,7 +158,7 @@ public class PlayerFactionHandler implements IPlayerFaction {
         IPersonaExtensionProvider factory = PlayerFactionHandler::createNewPersonaData;
         // some example code to dispatch IMC to another mod
         InterModComms.sendTo("mkcore", "register_persona_extension", () -> {
-            MKFactionMod.LOGGER.info("Faction register persona by IMC");
+            MKFactionMod.LOGGER.debug("Faction register persona by IMC");
             return factory;
         });
     }

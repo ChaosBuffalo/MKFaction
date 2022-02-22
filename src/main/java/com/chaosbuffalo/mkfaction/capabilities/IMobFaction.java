@@ -9,6 +9,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public interface IMobFaction extends INBTSerializable<CompoundNBT> {
 
+    boolean hasFaction();
+
     ResourceLocation getFactionName();
 
     void setFactionName(ResourceLocation factionName);

@@ -3,8 +3,7 @@ package com.chaosbuffalo.mkfaction.event;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.faction.FactionDefaultManager;
-import com.chaosbuffalo.mkfaction.faction.MKFaction;
-import com.chaosbuffalo.mkfaction.network.MobFactionUpdatePacket;
+import com.chaosbuffalo.mkfaction.network.MobFactionAssignmentPacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -24,7 +23,7 @@ public class MobHandlers {
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.getPlayer();
         event.getTarget().getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY).ifPresent(mobFaction ->
                 serverPlayer.connection.sendPacket(PacketHandler.getNetworkChannel()
-                        .toVanillaPacket(new MobFactionUpdatePacket(mobFaction), NetworkDirection.PLAY_TO_CLIENT)));
+                        .toVanillaPacket(new MobFactionAssignmentPacket(mobFaction), NetworkDirection.PLAY_TO_CLIENT)));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -34,7 +33,7 @@ public class MobHandlers {
 
         if (event.getEntity() instanceof LivingEntity && !(event.getEntity() instanceof ServerPlayerEntity)) {
             event.getEntity().getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY).ifPresent(mobFaction -> {
-                if (mobFaction.getFactionName().equals(MKFaction.INVALID_FACTION)) {
+                if (!mobFaction.hasFaction()) {
                     FactionDefaultManager.getDefaultFaction(event.getEntity()).ifPresent(mobFaction::setFactionName);
                 }
             });

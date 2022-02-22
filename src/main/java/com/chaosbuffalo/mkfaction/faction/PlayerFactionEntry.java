@@ -1,43 +1,34 @@
 package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkcore.sync.IMKSerializable;
-import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.function.Consumer;
-
-import static com.chaosbuffalo.mkfaction.faction.MKFaction.INVALID_FACTION;
 
 
 public class PlayerFactionEntry implements IMKSerializable<CompoundNBT> {
 
+    private final MKFaction faction;
+    private final Consumer<PlayerFactionEntry> dirtyNotifier;
     private int factionScore;
-    private final ResourceLocation factionName;
     private PlayerFactionStatus factionStatus;
-    private Consumer<PlayerFactionEntry> dirtyNotifier;
 
-    public PlayerFactionEntry(ResourceLocation factionName) {
-        this.factionName = factionName;
-        setFactionScore(0);
+    public PlayerFactionEntry(MKFaction faction, Consumer<PlayerFactionEntry> dirtyNotifier) {
+        this.faction = faction;
+        this.dirtyNotifier = dirtyNotifier;
+        reset();
     }
 
-    public void setToDefaultFactionScore() {
-        if (factionName.equals(INVALID_FACTION)) {
-            setFactionScore(0);
-        } else {
-            MKFaction faction = MKFactionRegistry.getFaction(factionName);
-            if (faction != null) {
-                setFactionScore(faction.getDefaultPlayerScore());
-            } else {
-                setFactionScore(0);
-            }
-        }
+    public MKFaction getFaction() {
+        return faction;
     }
 
     public ResourceLocation getFactionName() {
-        return factionName;
+        return faction.getRegistryName();
     }
 
     public int getFactionScore() {
@@ -48,6 +39,10 @@ public class PlayerFactionEntry implements IMKSerializable<CompoundNBT> {
         this.factionScore = factionScore;
         factionStatus = PlayerFactionStatus.forScore(factionScore);
         markDirty();
+    }
+
+    public void reset() {
+        setFactionScore(faction.getDefaultPlayerScore());
     }
 
     public void incrementFaction(int toAdd) {
@@ -66,6 +61,11 @@ public class PlayerFactionEntry implements IMKSerializable<CompoundNBT> {
         return factionStatus;
     }
 
+    public IFormattableTextComponent getStatusDisplayName() {
+        // TODO: add support for per-faction custom standing names here
+        return factionStatus.getDefaultDisplayName();
+    }
+
     @Override
     public CompoundNBT serialize() {
         CompoundNBT tag = new CompoundNBT();
@@ -79,10 +79,6 @@ public class PlayerFactionEntry implements IMKSerializable<CompoundNBT> {
             setFactionScore(nbt.getInt("factionScore"));
         }
         return true;
-    }
-
-    public void setDirtyNotifier(Consumer<PlayerFactionEntry> notifier) {
-        dirtyNotifier = notifier;
     }
 
     private void markDirty() {

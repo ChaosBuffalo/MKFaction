@@ -4,10 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.client.resources.ReloadListener;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
@@ -16,13 +12,16 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 
 public abstract class SingleJsonFileReloadListener extends ReloadListener<JsonObject> {
     private static final Logger LOGGER = LogManager.getLogger();
     private final Gson gson;
     private final ResourceLocation loc;
 
-    public SingleJsonFileReloadListener(Gson gson, String modid, String path){
+    public SingleJsonFileReloadListener(Gson gson, String modid, String path) {
         this.gson = gson;
         this.loc = new ResourceLocation(modid, path + ".json");
     }
