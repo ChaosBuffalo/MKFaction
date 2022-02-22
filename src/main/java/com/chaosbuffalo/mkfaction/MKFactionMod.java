@@ -41,7 +41,7 @@ public class MKFactionMod {
 
 
     private void setup(final FMLCommonSetupEvent event) {
-        LOGGER.info("MKFactionMod.setup");
+        LOGGER.debug("MKFactionMod.setup");
         PacketHandler.setupHandler();
         TargetingHooks.registerHooks();
         FactionCapabilities.registerCapabilities();
@@ -49,7 +49,6 @@ public class MKFactionMod {
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
-        LOGGER.info("Client setup");
         InputHandler.registerKeybinds();
     }
 

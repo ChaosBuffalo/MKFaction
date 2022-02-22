@@ -7,23 +7,21 @@ import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MobFactionUpdatePacket {
+public class MobFactionAssignmentPacket {
 
     private final ResourceLocation factionName;
     private final int entityId;
 
-    public MobFactionUpdatePacket(IMobFaction mobFaction) {
+    public MobFactionAssignmentPacket(IMobFaction mobFaction) {
         entityId = mobFaction.getEntity().getEntityId();
         factionName = mobFaction.getFactionName();
     }
 
-    public MobFactionUpdatePacket(PacketBuffer buffer) {
+    public MobFactionAssignmentPacket(PacketBuffer buffer) {
         entityId = buffer.readInt();
         factionName = buffer.readResourceLocation();
     }
@@ -33,22 +31,24 @@ public class MobFactionUpdatePacket {
         buffer.writeResourceLocation(factionName);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    private void handleClient() {
-        World world = Minecraft.getInstance().world;
-        if (world != null) {
-            Entity entity = world.getEntityByID(entityId);
-            if (entity != null) {
-                entity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY).ifPresent(mobFaction -> {
-                    mobFaction.setFactionName(factionName);
-                });
-            }
-        }
-    }
-
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(this::handleClient);
+        ctx.enqueueWork(() -> ClientHandler.handle(this));
         ctx.setPacketHandled(true);
+    }
+
+    public static class ClientHandler {
+        public static void handle(MobFactionAssignmentPacket packet) {
+            World world = Minecraft.getInstance().world;
+            if (world == null) {
+                return;
+            }
+
+            Entity entity = world.getEntityByID(packet.entityId);
+            if (entity != null) {
+                entity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY).ifPresent(mobFaction ->
+                        mobFaction.setFactionName(packet.factionName));
+            }
+        }
     }
 }

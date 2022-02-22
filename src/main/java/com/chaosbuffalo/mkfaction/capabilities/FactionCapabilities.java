@@ -8,8 +8,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class FactionCapabilities {
@@ -31,8 +34,8 @@ public class FactionCapabilities {
     }
 
     public static void registerCapabilities() {
-        CapabilityManager.INSTANCE.register(IPlayerFaction.class, new Storage<>(), PlayerFactionHandler::new);
-        CapabilityManager.INSTANCE.register(IMobFaction.class, new Storage<>(), MobFactionHandler::new);
+        CapabilityManager.INSTANCE.register(IPlayerFaction.class, new Storage<>(), () -> null);
+        CapabilityManager.INSTANCE.register(IMobFaction.class, new Storage<>(), () -> null);
     }
 
     public static class Storage<T extends INBTSerializable<CompoundNBT>> implements Capability.IStorage<T> {
@@ -52,6 +55,42 @@ public class FactionCapabilities {
                 CompoundNBT tag = (CompoundNBT) nbt;
                 instance.deserializeNBT(tag);
             }
+        }
+    }
+
+    public abstract static class Provider<CapTarget, CapType extends INBTSerializable<CompoundNBT>>
+            implements ICapabilitySerializable<CompoundNBT> {
+
+        private final CapType data;
+        private final LazyOptional<CapType> capOpt;
+
+        public Provider(CapTarget attached) {
+            data = makeData(attached);
+            capOpt = LazyOptional.of(() -> data);
+        }
+
+        abstract CapType makeData(CapTarget attached);
+
+        abstract Capability<CapType> getCapability();
+
+        @Nonnull
+        @Override
+        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+            return getCapability().orEmpty(cap, capOpt);
+        }
+
+        public void invalidate() {
+            capOpt.invalidate();
+        }
+
+        @Override
+        public CompoundNBT serializeNBT() {
+            return data.serializeNBT();
+        }
+
+        @Override
+        public void deserializeNBT(CompoundNBT nbt) {
+            data.deserializeNBT(nbt);
         }
     }
 }

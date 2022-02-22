@@ -11,7 +11,7 @@ public class TargetingHooks {
 
     private static Targeting.TargetRelation getPlayerMobRelation(PlayerEntity source, IMobFaction mobFaction) {
         return source.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY)
-                .map(playerFaction -> playerFaction.getFactionRelation(mobFaction.getFactionName()))
+                .map(playerFaction -> playerFaction.getFactionRelation(mobFaction))
                 .orElse(Targeting.TargetRelation.UNHANDLED);
     }
 

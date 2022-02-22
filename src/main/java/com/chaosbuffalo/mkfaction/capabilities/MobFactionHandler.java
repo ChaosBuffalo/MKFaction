@@ -2,26 +2,33 @@ package com.chaosbuffalo.mkfaction.capabilities;
 
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
-import com.chaosbuffalo.mkfaction.network.MobFactionUpdatePacket;
+import com.chaosbuffalo.mkfaction.network.MobFactionAssignmentPacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import com.chaosbuffalo.targeting_api.Targeting;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 
 public class MobFactionHandler implements IMobFaction {
+    private final LivingEntity entity;
     private ResourceLocation factionName;
     private MKFaction faction;
-    private LivingEntity entity;
 
-    public MobFactionHandler() {
+    public MobFactionHandler(LivingEntity entity) {
+        this.entity = entity;
         factionName = MKFaction.INVALID_FACTION;
-        entity = null;
+        faction = null;
+    }
+
+    @Override
+    public boolean hasFaction() {
+        return faction != null;
     }
 
     @Nullable
@@ -30,7 +37,6 @@ public class MobFactionHandler implements IMobFaction {
         return faction;
     }
 
-
     @Override
     public ResourceLocation getFactionName() {
         return factionName;
@@ -38,8 +44,9 @@ public class MobFactionHandler implements IMobFaction {
 
     private void setFactionNameInternal(ResourceLocation factionName) {
         this.factionName = factionName;
-        if (!factionName.equals(MKFaction.INVALID_FACTION)) {
-            this.faction = MKFactionRegistry.getFaction(factionName);
+        this.faction = MKFactionRegistry.getFaction(factionName);
+        if (!factionName.equals(MKFaction.INVALID_FACTION) && faction == null) {
+            throw new IllegalStateException(String.format("Entity %s was switched to unregistered faction '%s'", entity, factionName));
         }
     }
 
@@ -51,13 +58,9 @@ public class MobFactionHandler implements IMobFaction {
     }
 
     public void syncToAllTracking() {
-        MobFactionUpdatePacket updatePacket = new MobFactionUpdatePacket(this);
+        MobFactionAssignmentPacket updatePacket = new MobFactionAssignmentPacket(this);
         PacketDistributor.TRACKING_ENTITY.with(this::getEntity)
                 .send(PacketHandler.getNetworkChannel().toVanillaPacket(updatePacket, NetworkDirection.PLAY_TO_CLIENT));
-    }
-
-    public void attach(LivingEntity entity) {
-        this.entity = entity;
     }
 
     @Override
@@ -95,6 +98,23 @@ public class MobFactionHandler implements IMobFaction {
             setFactionNameInternal(new ResourceLocation(nbt.getString("factionName")));
         } else {
             setFactionNameInternal(MKFaction.INVALID_FACTION);
+        }
+    }
+
+    public static class Provider extends FactionCapabilities.Provider<LivingEntity, IMobFaction> {
+
+        public Provider(LivingEntity entity) {
+            super(entity);
+        }
+
+        @Override
+        IMobFaction makeData(LivingEntity attached) {
+            return new MobFactionHandler(attached);
+        }
+
+        @Override
+        Capability<IMobFaction> getCapability() {
+            return FactionCapabilities.MOB_FACTION_CAPABILITY;
         }
     }
 }
