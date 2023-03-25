@@ -2,14 +2,14 @@ package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkcore.sync.IMKSerializable;
 import com.chaosbuffalo.targeting_api.Targeting;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.function.Consumer;
 
 
-public class PlayerFactionEntry implements IMKSerializable<CompoundNBT> {
+public class PlayerFactionEntry implements IMKSerializable<CompoundTag> {
 
     private final MKFaction faction;
     private final Consumer<PlayerFactionEntry> dirtyNotifier;
@@ -60,19 +60,19 @@ public class PlayerFactionEntry implements IMKSerializable<CompoundNBT> {
         return factionStatus;
     }
 
-    public IFormattableTextComponent getStatusDisplayName() {
+    public MutableComponent getStatusDisplayName() {
         return faction.getStatusName(factionStatus);
     }
 
     @Override
-    public CompoundNBT serialize() {
-        CompoundNBT tag = new CompoundNBT();
+    public CompoundTag serialize() {
+        CompoundTag tag = new CompoundTag();
         tag.putInt("factionScore", getFactionScore());
         return tag;
     }
 
     @Override
-    public boolean deserialize(CompoundNBT nbt) {
+    public boolean deserialize(CompoundTag nbt) {
         if (nbt.contains("factionScore")) {
             setFactionScore(nbt.getInt("factionScore"));
         }

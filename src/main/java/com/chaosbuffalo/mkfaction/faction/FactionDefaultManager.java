@@ -3,10 +3,10 @@ package com.chaosbuffalo.mkfaction.faction;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.util.SingleJsonFileReloadListener;
 import com.google.gson.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 
@@ -37,8 +37,8 @@ public class FactionDefaultManager extends SingleJsonFileReloadListener {
     }
 
     @Override
-    protected void apply(JsonObject objectIn, @Nullable IResourceManager resourceManagerIn,
-                         @Nonnull IProfiler profilerIn) {
+    protected void apply(JsonObject objectIn, @Nullable ResourceManager resourceManagerIn,
+                         @Nonnull ProfilerFiller profilerIn) {
         JsonArray arr = objectIn.getAsJsonArray("members");
         factionDefaults.clear();
         for (JsonElement ele : arr) {

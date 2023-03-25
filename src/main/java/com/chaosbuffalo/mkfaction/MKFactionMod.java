@@ -44,7 +44,6 @@ public class MKFactionMod {
         LOGGER.debug("MKFactionMod.setup");
         PacketHandler.setupHandler();
         TargetingHooks.registerHooks();
-        FactionCapabilities.registerCapabilities();
         FactionCommand.registerArgumentTypes();
     }
 

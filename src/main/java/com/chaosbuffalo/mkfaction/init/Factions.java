@@ -3,7 +3,7 @@ package com.chaosbuffalo.mkfaction.init;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.faction.FactionConstants;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

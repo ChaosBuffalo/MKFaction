@@ -2,12 +2,12 @@ package com.chaosbuffalo.mkfaction.capabilities;
 
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.targeting_api.Targeting;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IMobFaction extends INBTSerializable<CompoundNBT> {
+public interface IMobFaction extends INBTSerializable<CompoundTag> {
 
     boolean hasFaction();
 

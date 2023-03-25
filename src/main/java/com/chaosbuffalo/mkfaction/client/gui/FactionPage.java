@@ -15,9 +15,9 @@ import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKScrollView;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKText;
 import com.chaosbuffalo.mkwidgets.client.gui.widgets.MKWidget;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.InterModComms;
 
 import java.util.Comparator;
@@ -28,7 +28,7 @@ public class FactionPage extends PlayerPageBase {
     protected MKScrollView scrollView;
 
     public FactionPage(MKPlayerData playerData) {
-        super(playerData, new StringTextComponent("Factions"));
+        super(playerData, new TextComponent("Factions"));
     }
 
     @Override
@@ -50,20 +50,20 @@ public class FactionPage extends PlayerPageBase {
 
     public MKLayout getFactionEntryLayout(PlayerFactionEntry entry, int width) {
         MKFaction faction = entry.getFaction();
-        MKLayout entryLayout = new MKLayout(0, 0, width, font.FONT_HEIGHT + 10);
+        MKLayout entryLayout = new MKLayout(0, 0, width, font.lineHeight + 10);
         entryLayout.setMargins(5, 5, 5, 5);
 
-        ITextComponent nameText = faction.getDisplayName();
+        Component nameText = faction.getDisplayName();
         MKText factionName = new MKText(font, nameText);
         factionName.setColor(0xffffffff);
-        factionName.setWidth(font.getStringPropertyWidth(nameText));
+        factionName.setWidth(font.width(nameText));
         entryLayout.addWidget(factionName, MarginConstraint.TOP, MarginConstraint.LEFT);
 
-        ITextComponent valueText = entry.getStatusDisplayName()
-                .appendString(String.format(" (%d)", entry.getFactionScore()))
-                .mergeStyle(entry.getFactionStatus().getColor());
+        Component valueText = entry.getStatusDisplayName()
+                .append(String.format(" (%d)", entry.getFactionScore()))
+                .withStyle(entry.getFactionStatus().getColor());
         MKText factionValue = new MKText(font, valueText);
-        factionValue.setWidth(font.getStringPropertyWidth(valueText));
+        factionValue.setWidth(font.width(valueText));
         entryLayout.addWidget(factionValue, MarginConstraint.TOP, MarginConstraint.RIGHT);
         return entryLayout;
     }
@@ -96,8 +96,8 @@ public class FactionPage extends PlayerPageBase {
         }
 
         @Override
-        public ITextComponent getDisplayName() {
-            return new StringTextComponent("Factions");
+        public Component getDisplayName() {
+            return new TextComponent("Factions");
         }
 
         @Override

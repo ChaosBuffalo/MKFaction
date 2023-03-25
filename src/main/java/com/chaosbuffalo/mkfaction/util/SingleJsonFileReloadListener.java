@@ -3,12 +3,12 @@ package com.chaosbuffalo.mkfaction.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.minecraft.client.resources.ReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResource;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +16,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 
-public abstract class SingleJsonFileReloadListener extends ReloadListener<JsonObject> {
+public abstract class SingleJsonFileReloadListener extends SimplePreparableReloadListener<JsonObject> {
     private static final Logger LOGGER = LogManager.getLogger();
     private final Gson gson;
     private final ResourceLocation loc;
@@ -31,13 +31,13 @@ public abstract class SingleJsonFileReloadListener extends ReloadListener<JsonOb
     }
 
     @Override
-    protected JsonObject prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
+    protected JsonObject prepare(ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
         try (
-                IResource iresource = resourceManagerIn.getResource(getLoc());
+                Resource iresource = resourceManagerIn.getResource(getLoc());
                 InputStream inputstream = iresource.getInputStream();
                 Reader reader = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8));
         ) {
-            JsonObject jsonobject = JSONUtils.fromJson(this.gson, reader, JsonObject.class);
+            JsonObject jsonobject = GsonHelper.fromJson(this.gson, reader, JsonObject.class);
             if (jsonobject != null) {
                 return jsonobject;
             } else {

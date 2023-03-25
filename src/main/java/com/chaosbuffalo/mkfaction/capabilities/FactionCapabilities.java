@@ -1,20 +1,23 @@
 package com.chaosbuffalo.mkfaction.capabilities;
 
+import com.chaosbuffalo.mkcore.MKCore;
+import com.chaosbuffalo.mkcore.core.MKEntityData;
+import com.chaosbuffalo.mkcore.core.MKPlayerData;
 import com.chaosbuffalo.mkfaction.MKFactionMod;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+@Mod.EventBusSubscriber(modid = MKFactionMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class FactionCapabilities {
 
     public static ResourceLocation PLAYER_FACTION_CAP_ID = new ResourceLocation(MKFactionMod.MODID,
@@ -22,44 +25,20 @@ public class FactionCapabilities {
     public static ResourceLocation MOB_FACTION_CAP_ID = new ResourceLocation(MKFactionMod.MODID,
             "mob_faction_data");
 
-    @CapabilityInject(IPlayerFaction.class)
-    public static final Capability<IPlayerFaction> PLAYER_FACTION_CAPABILITY;
+    public static final Capability<IPlayerFaction> PLAYER_FACTION_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
-    @CapabilityInject(IMobFaction.class)
-    public static final Capability<IMobFaction> MOB_FACTION_CAPABILITY;
 
-    static {
-        PLAYER_FACTION_CAPABILITY = null;
-        MOB_FACTION_CAPABILITY = null;
+    public static final Capability<IMobFaction> MOB_FACTION_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
+
+
+    @SubscribeEvent
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.register(IPlayerFaction.class);
+        event.register(IMobFaction.class);
     }
 
-    public static void registerCapabilities() {
-        CapabilityManager.INSTANCE.register(IPlayerFaction.class, new Storage<>(), () -> null);
-        CapabilityManager.INSTANCE.register(IMobFaction.class, new Storage<>(), () -> null);
-    }
-
-    public static class Storage<T extends INBTSerializable<CompoundNBT>> implements Capability.IStorage<T> {
-
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<T> capability, T instance, Direction side) {
-            if (instance == null) {
-                return null;
-            }
-            return instance.serializeNBT();
-        }
-
-        @Override
-        public void readNBT(Capability<T> capability, T instance, Direction side, INBT nbt) {
-            if (nbt instanceof CompoundNBT && instance != null) {
-                CompoundNBT tag = (CompoundNBT) nbt;
-                instance.deserializeNBT(tag);
-            }
-        }
-    }
-
-    public abstract static class Provider<CapTarget, CapType extends INBTSerializable<CompoundNBT>>
-            implements ICapabilitySerializable<CompoundNBT> {
+    public abstract static class Provider<CapTarget, CapType extends INBTSerializable<CompoundTag>>
+            implements ICapabilitySerializable<CompoundTag> {
 
         private final CapType data;
         private final LazyOptional<CapType> capOpt;
@@ -84,12 +63,12 @@ public class FactionCapabilities {
         }
 
         @Override
-        public CompoundNBT serializeNBT() {
+        public CompoundTag serializeNBT() {
             return data.serializeNBT();
         }
 
         @Override
-        public void deserializeNBT(CompoundNBT nbt) {
+        public void deserializeNBT(CompoundTag nbt) {
             data.deserializeNBT(nbt);
         }
     }

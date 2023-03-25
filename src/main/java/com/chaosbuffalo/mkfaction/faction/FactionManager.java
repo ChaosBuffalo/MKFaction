@@ -10,20 +10,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.client.resources.JsonReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-public class FactionManager extends JsonReloadListener {
+public class FactionManager extends SimpleJsonResourceReloadListener {
     public static final String DEFINITION_FOLDER = "factions";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
@@ -34,8 +34,8 @@ public class FactionManager extends JsonReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> objectIn,
-                         @Nonnull IResourceManager resourceManagerIn,
-                         @Nonnull IProfiler profilerIn) {
+                         @Nonnull ResourceManager resourceManagerIn,
+                         @Nonnull ProfilerFiller profilerIn) {
         MKFactionMod.LOGGER.debug("FactionManager reloading all files");
         for (Map.Entry<ResourceLocation, JsonElement> entry : objectIn.entrySet()) {
             ResourceLocation factionId = entry.getKey();
@@ -59,11 +59,11 @@ public class FactionManager extends JsonReloadListener {
         if (event.getPlayer() != null) {
             // sync to single player
             MKFactionMod.LOGGER.debug("Sending {} faction definition update packet", event.getPlayer());
-            event.getPlayer().connection.sendPacket(
+            event.getPlayer().connection.send(
                     PacketHandler.getNetworkChannel().toVanillaPacket(updatePacket, NetworkDirection.PLAY_TO_CLIENT));
         } else {
             // sync to playerlist
-            event.getPlayerList().sendPacketToAllPlayers(
+            event.getPlayerList().broadcastAll(
                     PacketHandler.getNetworkChannel().toVanillaPacket(updatePacket, NetworkDirection.PLAY_TO_CLIENT));
         }
     }

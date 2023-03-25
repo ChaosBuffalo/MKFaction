@@ -6,12 +6,12 @@ import com.chaosbuffalo.targeting_api.Targeting;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import java.util.EnumMap;
@@ -50,14 +50,14 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         }
     }
 
-    public IFormattableTextComponent getDisplayName() {
-        return new TranslationTextComponent(getTranslationKey());
+    public MutableComponent getDisplayName() {
+        return new TranslatableComponent(getTranslationKey());
     }
 
-    public IFormattableTextComponent getStatusName(PlayerFactionStatus status) {
+    public MutableComponent getStatusName(PlayerFactionStatus status) {
         String customName = customStatusNames.get(status);
         if (customName != null) {
-            return new StringTextComponent(customName);
+            return new TextComponent(customName);
         }
         return status.getDefaultDisplayName();
     }
@@ -115,7 +115,7 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
     }
 
     public boolean isMember(LivingEntity entity) {
-        if (entity instanceof PlayerEntity) {
+        if (entity instanceof Player) {
             return false;
         } else {
             return entity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)

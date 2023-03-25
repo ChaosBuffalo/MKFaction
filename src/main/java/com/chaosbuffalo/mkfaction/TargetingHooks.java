@@ -3,19 +3,19 @@ package com.chaosbuffalo.mkfaction;
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
 import com.chaosbuffalo.mkfaction.capabilities.IMobFaction;
 import com.chaosbuffalo.targeting_api.Targeting;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class TargetingHooks {
 
-    private static Targeting.TargetRelation getPlayerMobRelation(PlayerEntity source, IMobFaction mobFaction) {
+    private static Targeting.TargetRelation getPlayerMobRelation(Player source, IMobFaction mobFaction) {
         return source.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY)
                 .map(playerFaction -> playerFaction.getFactionRelation(mobFaction))
                 .orElse(Targeting.TargetRelation.UNHANDLED);
     }
 
-    private static Targeting.TargetRelation playerTargetLiving(PlayerEntity source, LivingEntity target) {
+    private static Targeting.TargetRelation playerTargetLiving(Player source, LivingEntity target) {
         return target.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)
                 .map(targetFaction -> getPlayerMobRelation(source, targetFaction))
                 .orElse(Targeting.TargetRelation.UNHANDLED);
@@ -28,9 +28,9 @@ public class TargetingHooks {
     }
 
     private static Targeting.TargetRelation targetHook(Entity source, Entity target) {
-        if (source instanceof PlayerEntity) {
-            if (target instanceof LivingEntity && !(target instanceof PlayerEntity)) {
-                return playerTargetLiving((PlayerEntity) source, (LivingEntity) target);
+        if (source instanceof Player) {
+            if (target instanceof LivingEntity && !(target instanceof Player)) {
+                return playerTargetLiving((Player) source, (LivingEntity) target);
             }
         } else if (source instanceof LivingEntity) {
             if (target instanceof LivingEntity) {

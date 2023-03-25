@@ -5,13 +5,13 @@ import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.mkfaction.network.MobFactionAssignmentPacket;
 import com.chaosbuffalo.mkfaction.network.PacketHandler;
 import com.chaosbuffalo.targeting_api.Targeting;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 
@@ -52,7 +52,7 @@ public class MobFactionHandler implements IMobFaction {
 
     public void setFactionName(ResourceLocation factionName) {
         setFactionNameInternal(factionName);
-        if (!getEntity().getEntityWorld().isRemote) {
+        if (!getEntity().getCommandSenderWorld().isClientSide) {
             syncToAllTracking();
         }
     }
@@ -75,7 +75,7 @@ public class MobFactionHandler implements IMobFaction {
             return Targeting.TargetRelation.UNHANDLED;
         }
 
-        if (otherEntity instanceof PlayerEntity) {
+        if (otherEntity instanceof Player) {
             return otherEntity.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY)
                     .map(playerFaction -> playerFaction.getFactionRelation(factionName))
                     .orElse(Targeting.TargetRelation.UNHANDLED);
@@ -86,14 +86,14 @@ public class MobFactionHandler implements IMobFaction {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT tag = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = new CompoundTag();
         tag.putString("factionName", getFactionName().toString());
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         if (nbt.contains("factionName")) {
             setFactionNameInternal(new ResourceLocation(nbt.getString("factionName")));
         } else {

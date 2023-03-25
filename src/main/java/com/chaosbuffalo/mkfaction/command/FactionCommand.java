@@ -14,20 +14,20 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.command.arguments.ArgumentSerializer;
-import net.minecraft.command.arguments.ArgumentTypes;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
+import net.minecraft.commands.synchronization.ArgumentTypes;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.concurrent.CompletableFuture;
 
 public class FactionCommand {
 
-    public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        LiteralArgumentBuilder<CommandSource> builder = Commands.literal("mk")
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("mk")
                 .then(Commands.literal("faction")
                         .then(Commands.literal("show")
                                 .then(Commands.argument("faction", FactionIdArgument.factionId())
@@ -55,15 +55,15 @@ public class FactionCommand {
     }
 
     public static void registerArgumentTypes() {
-        ArgumentTypes.register("faction_id", FactionIdArgument.class, new ArgumentSerializer<>(FactionIdArgument::new));
+        ArgumentTypes.register("faction_id", FactionIdArgument.class, new EmptyArgumentSerializer<>(FactionIdArgument::new));
     }
 
     private static String describeEntry(PlayerFactionEntry entry) {
         return String.format("%s: %d (%s)", entry.getFactionName(), entry.getFactionScore(), entry.getFactionStatus());
     }
 
-    static int addFaction(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
-        ServerPlayerEntity player = ctx.getSource().asPlayer();
+    static int addFaction(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
         ResourceLocation factionId = ctx.getArgument("faction", ResourceLocation.class);
         int amount = IntegerArgumentType.getInteger(ctx, "amount");
 
@@ -78,8 +78,8 @@ public class FactionCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    static int setFaction(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
-        ServerPlayerEntity player = ctx.getSource().asPlayer();
+    static int setFaction(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
         ResourceLocation factionId = ctx.getArgument("faction", ResourceLocation.class);
         int amount = IntegerArgumentType.getInteger(ctx, "amount");
 
@@ -94,8 +94,8 @@ public class FactionCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    static int showFaction(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
-        ServerPlayerEntity player = ctx.getSource().asPlayer();
+    static int showFaction(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
         ResourceLocation factionId = ctx.getArgument("faction", ResourceLocation.class);
 
         player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
@@ -109,8 +109,8 @@ public class FactionCommand {
     }
 
 
-    static int showAllFactions(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
-        ServerPlayerEntity player = ctx.getSource().asPlayer();
+    static int showAllFactions(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
 
         player.getCapability(FactionCapabilities.PLAYER_FACTION_CAPABILITY).ifPresent(faction -> {
             faction.getFactionMap().forEach((name, entry) -> {
@@ -135,7 +135,7 @@ public class FactionCommand {
 
         @Override
         public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
-            return ISuggestionProvider.suggest(MKFactionRegistry.FACTION_REGISTRY.getKeys().stream().map(ResourceLocation::toString), builder);
+            return SharedSuggestionProvider.suggest(MKFactionRegistry.FACTION_REGISTRY.getKeys().stream().map(ResourceLocation::toString), builder);
         }
     }
 }

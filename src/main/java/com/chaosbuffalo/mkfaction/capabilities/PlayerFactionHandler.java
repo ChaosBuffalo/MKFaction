@@ -10,9 +10,9 @@ import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.chaosbuffalo.mkfaction.faction.PlayerFactionEntry;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.InterModComms;
 
@@ -23,10 +23,10 @@ import java.util.Optional;
 
 public class PlayerFactionHandler implements IPlayerFaction {
 
-    private final PlayerEntity player;
+    private final Player player;
     private MKPlayerData playerData;
 
-    public PlayerFactionHandler(PlayerEntity player) {
+    public PlayerFactionHandler(Player player) {
         // Do not attempt to access any persona-specific data here because at this time
         // it's impossible to get a copy of MKPlayerData
         this.player = player;
@@ -42,7 +42,7 @@ public class PlayerFactionHandler implements IPlayerFaction {
     }
 
     @Override
-    public PlayerEntity getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
@@ -58,14 +58,14 @@ public class PlayerFactionHandler implements IPlayerFaction {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
+    public CompoundTag serializeNBT() {
         // This would be where global data that is shared across personas would be persisted.
         // Currently, there is none.
-        return new CompoundNBT();
+        return new CompoundTag();
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
     }
 
     public static class PersonaFactionData implements IPersonaExtension {
@@ -80,7 +80,7 @@ public class PlayerFactionHandler implements IPlayerFaction {
             factionUpdater = new SyncMapUpdater<>("factions",
                     () -> factionMap,
                     ResourceLocation::toString,
-                    ResourceLocation::tryCreate,
+                    ResourceLocation::tryParse,
                     this::createNewEntry
             );
             persona.getKnowledge().addSyncPrivate(factionUpdater);
@@ -135,15 +135,15 @@ public class PlayerFactionHandler implements IPlayerFaction {
         }
 
         @Override
-        public CompoundNBT serialize() {
+        public CompoundTag serialize() {
 //            MKFactionMod.LOGGER.info("PersonaFactionData.serialize");
-            CompoundNBT tag = new CompoundNBT();
+            CompoundTag tag = new CompoundTag();
             tag.put("factions", factionUpdater.serializeStorage());
             return tag;
         }
 
         @Override
-        public void deserialize(CompoundNBT nbt) {
+        public void deserialize(CompoundTag nbt) {
 //            MKFactionMod.LOGGER.info("PersonaFactionData.deserialize {}", nbt);
             factionUpdater.deserializeStorage(nbt.getCompound("factions"));
         }
@@ -163,14 +163,14 @@ public class PlayerFactionHandler implements IPlayerFaction {
         });
     }
 
-    public static class Provider extends FactionCapabilities.Provider<PlayerEntity, IPlayerFaction> {
+    public static class Provider extends FactionCapabilities.Provider<Player, IPlayerFaction> {
 
-        public Provider(PlayerEntity entity) {
+        public Provider(Player entity) {
             super(entity);
         }
 
         @Override
-        IPlayerFaction makeData(PlayerEntity attached) {
+        IPlayerFaction makeData(Player attached) {
             return new PlayerFactionHandler(attached);
         }
 

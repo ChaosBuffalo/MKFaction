@@ -4,11 +4,11 @@ import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.mkfaction.faction.MKFaction;
 import com.mojang.serialization.Dynamic;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.NBTDynamicOps;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +20,7 @@ public class MKFactionDefinitionUpdatePacket {
 
     private static class MKFactionData {
         public final MKFaction faction;
-        public INBT encoded;
+        public Tag encoded;
 
         public MKFactionData(MKFaction faction) {
             this.faction = faction;
@@ -34,24 +34,24 @@ public class MKFactionDefinitionUpdatePacket {
         }
     }
 
-    public MKFactionDefinitionUpdatePacket(PacketBuffer buffer) {
+    public MKFactionDefinitionUpdatePacket(FriendlyByteBuf buffer) {
         factionData = new ArrayList<>();
         int count = buffer.readInt();
         for (int i = 0; i < count; i++) {
             MKFaction faction = buffer.readRegistryIdUnsafe(MKFactionRegistry.FACTION_REGISTRY);
             if (faction != null) {
                 MKFactionData data = new MKFactionData(faction);
-                data.encoded = buffer.readCompoundTag();
+                data.encoded = buffer.readNbt();
                 factionData.add(data);
             }
         }
     }
 
-    public void toBytes(PacketBuffer buffer) {
+    public void toBytes(FriendlyByteBuf buffer) {
         buffer.writeInt(factionData.size());
         for (MKFactionData data : factionData) {
             buffer.writeRegistryIdUnsafe(MKFactionRegistry.FACTION_REGISTRY, data.faction);
-            buffer.writeCompoundTag((CompoundNBT) data.faction.serialize(NBTDynamicOps.INSTANCE));
+            buffer.writeNbt((CompoundTag) data.faction.serialize(NbtOps.INSTANCE));
         }
     }
 
@@ -63,7 +63,7 @@ public class MKFactionDefinitionUpdatePacket {
                 MKFaction faction = data.faction;
                 MKFactionMod.LOGGER.debug("Parsing faction data: {}", faction.getRegistryName());
 
-                faction.deserialize(new Dynamic<>(NBTDynamicOps.INSTANCE, data.encoded));
+                faction.deserialize(new Dynamic<>(NbtOps.INSTANCE, data.encoded));
                 MKFactionMod.LOGGER.info("Updated Faction: {} new score: {}",
                         faction.getRegistryName(), faction.getDefaultPlayerScore());
             }
