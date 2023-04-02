@@ -2,6 +2,7 @@ package com.chaosbuffalo.mkfaction.faction;
 
 import com.chaosbuffalo.mkfaction.MKFactionMod;
 import com.chaosbuffalo.mkfaction.capabilities.FactionCapabilities;
+import com.chaosbuffalo.mkfaction.event.MKFactionRegistry;
 import com.chaosbuffalo.targeting_api.Targeting;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Dynamic;
@@ -42,9 +43,14 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         this.lastNames = new HashSet<>();
     }
 
+    public ResourceLocation getId() {
+        return MKFactionRegistry.FACTION_REGISTRY.getKey(this);
+    }
+
     public String getTranslationKey() {
-        if (getRegistryName() != null) {
-            return String.format("faction.%s.%s.name", getRegistryName().getNamespace(), getRegistryName().getPath());
+        ResourceLocation factionId = getId();
+        if (factionId != null) {
+            return String.format("faction.%s.%s.name", factionId.getNamespace(), factionId.getPath());
         } else {
             return "faction.mkfaction.invalid.name";
         }
@@ -119,7 +125,7 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
             return false;
         } else {
             return entity.getCapability(FactionCapabilities.MOB_FACTION_CAPABILITY)
-                    .map(cap -> cap.getFactionName().equals(getRegistryName()))
+                    .map(cap -> cap.getFactionName().equals(getId()))
                     .orElse(false);
         }
     }
@@ -169,7 +175,7 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
         dynamic.get(listName).asStream()
                 .map(x -> x.asString().result()
                         .orElseThrow(() -> new IllegalStateException("Failed to parse entry in '" + listName +
-                                "' for faction '" + getRegistryName() + "': " + x)))
+                                "' for faction '" + getId() + "': " + x)))
                 .forEach(consumer);
     }
 
@@ -178,7 +184,7 @@ public class MKFaction extends ForgeRegistryEntry<MKFaction> {
                 .map(x -> x.asString().result()
                         .map(ResourceLocation::new)
                         .orElseThrow(() -> new IllegalStateException("Failed to parse entry in '" + listName +
-                                "' for faction '" + getRegistryName() + "': " + x)))
+                                "' for faction '" + getId() + "': " + x)))
                 .forEach(consumer);
     }
 

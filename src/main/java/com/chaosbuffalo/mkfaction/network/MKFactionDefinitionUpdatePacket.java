@@ -61,11 +61,11 @@ public class MKFactionDefinitionUpdatePacket {
         ctx.enqueueWork(() -> {
             for (MKFactionData data : factionData) {
                 MKFaction faction = data.faction;
-                MKFactionMod.LOGGER.debug("Parsing faction data: {}", faction.getRegistryName());
+                MKFactionMod.LOGGER.debug("Parsing faction data: {}", faction.getId());
 
                 faction.deserialize(new Dynamic<>(NbtOps.INSTANCE, data.encoded));
                 MKFactionMod.LOGGER.info("Updated Faction: {} new score: {}",
-                        faction.getRegistryName(), faction.getDefaultPlayerScore());
+                        faction.getId(), faction.getDefaultPlayerScore());
             }
         });
         ctx.setPacketHandled(true);

@@ -34,7 +34,7 @@ public abstract class MKFactionDataProvider implements DataProvider {
 
     public void writeFaction(MKFaction faction, @Nonnull HashCache cache) {
         Path outputFolder = generator.getOutputFolder();
-        ResourceLocation key = Objects.requireNonNull(faction.getRegistryName());
+        ResourceLocation key = Objects.requireNonNull(faction.getId());
         Path local = Paths.get("data", key.getNamespace(), FactionManager.DEFINITION_FOLDER, key.getPath() + ".json");
         Path path = outputFolder.resolve(local);
         try {

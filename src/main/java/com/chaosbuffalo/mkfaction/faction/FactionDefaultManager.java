@@ -9,6 +9,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,7 +30,7 @@ public class FactionDefaultManager extends SingleJsonFileReloadListener {
     }
 
     public static Optional<ResourceLocation> getDefaultFaction(Entity entity) {
-        return getDefaultFaction(entity.getType().getRegistryName());
+        return getDefaultFaction(ForgeRegistries.ENTITIES.getKey(entity.getType()));
     }
 
     private void addReloadListener(AddReloadListenerEvent event) {

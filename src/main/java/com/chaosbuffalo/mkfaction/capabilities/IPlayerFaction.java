@@ -21,7 +21,7 @@ public interface IPlayerFaction extends INBTSerializable<CompoundTag> {
     Optional<PlayerFactionEntry> getFactionEntry(ResourceLocation factionName);
 
     default Optional<PlayerFactionEntry> getFactionEntry(MKFaction faction) {
-        return getFactionEntry(faction.getRegistryName());
+        return getFactionEntry(faction.getId());
     }
 
     default PlayerFactionStatus getFactionStatus(ResourceLocation factionName) {

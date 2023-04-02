@@ -27,7 +27,7 @@ public class PlayerFactionEntry implements IMKSerializable<CompoundTag> {
     }
 
     public ResourceLocation getFactionName() {
-        return faction.getRegistryName();
+        return faction.getId();
     }
 
     public int getFactionScore() {
